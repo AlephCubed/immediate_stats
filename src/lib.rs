@@ -20,21 +20,23 @@ mod tests {
 
     #[test]
     fn default() {
-        let mut h = Health {
-            health_base: 10,
-            health_bonus: 3,
-            health_multiplier: 1.5,
-        };
+        for base in 0..10 {
+            let mut h = Health {
+                health_base: base,
+                health_bonus: 3,
+                health_multiplier: 1.5,
+            };
 
-        h.reset_modifiers();
+            h.reset_modifiers();
 
-        assert_eq!(
-            h,
-            Health {
-                health_base: 10,
-                health_bonus: 0,
-                health_multiplier: 1.0,
-            }
-        );
+            assert_eq!(
+                h,
+                Health {
+                    health_base: base,
+                    health_bonus: 0,
+                    health_multiplier: 1.0,
+                }
+            );
+        }
     }
 }
