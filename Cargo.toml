@@ -1,0 +1,14 @@
+[package]
+name = "immediate_stats"
+version = "0.1.0"
+edition = "2024"
+keywords = ["game", "bevy", "stats"]
+categories = ["game-development", "data-structures"]
+
+[features]
+bevy = ["bevy_ecs", "bevy_app"]
+
+[dependencies]
+bevy_app = { version = "0.15.3", default-features = false, optional = true }
+bevy_ecs = { version = "0.15", default-features = false, optional = true }
+immediate_stats_macros = { path = "immediate_stats_macros" }
