@@ -1,5 +1,4 @@
-use proc_macro::TokenStream;
-use proc_macro2::Ident;
+use proc_macro2::{Ident, Span, TokenStream};
 use quote::quote;
 use std::collections::HashMap;
 use syn::{Data, DeriveInput};
@@ -18,6 +17,32 @@ impl Stat {
             AttrType::Bonus => self.bonus = Some(ident),
             AttrType::Multiplier => self.multiplier = Some(ident),
         }
+    }
+}
+
+impl Stat {
+    /// Create the calculation for stat total.
+    /// Results in `(self.base + self.bonus) * self.multiplier`
+    /// with type conversions and missing values removed.
+    /// # Panics
+    /// When `self.base` is `None`.
+    fn total_calculation(&self) -> TokenStream {
+        let result = self.base.clone().expect("All stats require a base!");
+        let mut result = quote! { self.#result };
+
+        if let Some(bonus) = &self.bonus {
+            result = quote! {
+                #result + self.#bonus
+            }
+        }
+
+        if let Some(multiplier) = &self.multiplier {
+            result = quote! {
+                ((#result) as f32 * self.#multiplier) as i32
+            }
+        }
+
+        result
     }
 }
 
@@ -49,7 +74,7 @@ impl TryFrom<&Ident> for AttrType {
 }
 
 #[proc_macro_derive(StatContainer, attributes(base, bonus, multiplier))]
-pub fn stat_container_derive(item: TokenStream) -> TokenStream {
+pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tree: DeriveInput = syn::parse(item).expect("A valid TokenStream");
 
     let struct_name = &tree.ident;
@@ -71,7 +96,14 @@ pub fn stat_container_derive(item: TokenStream) -> TokenStream {
                         continue;
                     };
 
-                    let stat_ident = path.segments.first().unwrap().ident.to_string();
+                    let mut stat_ident = String::new();
+
+                    attr.parse_nested_meta(|meta| {
+                        stat_ident = meta.path.get_ident().unwrap().to_string();
+                        Ok(())
+                    })
+                    .unwrap();
+
                     let stat = match stats.get_mut(&stat_ident) {
                         Some(s) => s,
                         None => {
@@ -91,12 +123,27 @@ pub fn stat_container_derive(item: TokenStream) -> TokenStream {
     let bonuses = stats.values().filter_map(|x| x.bonus.clone());
     let multipliers = stats.values().filter_map(|x| x.multiplier.clone());
 
+    let methods = stats.iter().map(|(name, stat)| {
+        let name = Ident::new(name, Span::call_site());
+        let calculation = stat.total_calculation();
+
+        quote! {
+            pub fn #name(&self) -> i32 {
+                #calculation
+            }
+        }
+    });
+
     quote! {
         impl StatContainer for #struct_name {
             fn reset_modifiers(&mut self) {
                 #(self.#bonuses = 0;)*
                 #(self.#multipliers = 1.0;)*
             }
+        }
+
+        impl #struct_name {
+            #(#methods)*
         }
     }
     .into()

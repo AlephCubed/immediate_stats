@@ -19,7 +19,7 @@ mod tests {
     }
 
     #[test]
-    fn default() {
+    fn reset() {
         for base in 0..10 {
             let mut h = Health {
                 health_base: base,
@@ -35,8 +35,21 @@ mod tests {
                     health_base: base,
                     health_bonus: 0,
                     health_multiplier: 1.0,
-                }
+                },
             );
         }
+    }
+
+    #[test]
+    fn calculate() {
+        assert_eq!(
+            Health {
+                health_base: 10,
+                health_bonus: 4,
+                health_multiplier: 1.5,
+            }
+            .health(),
+            21,
+        );
     }
 }
