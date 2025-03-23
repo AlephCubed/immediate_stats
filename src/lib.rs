@@ -5,9 +5,9 @@ pub trait StatContainer {
 
 #[cfg(test)]
 mod tests {
-    use immediate_stats_macros::StatContainer;
     use super::*;
-    
+    use immediate_stats_macros::StatContainer;
+
     #[derive(StatContainer, PartialEq, Debug)]
     struct Health {
         #[base(health)]
@@ -17,7 +17,7 @@ mod tests {
         #[multiplier(health)]
         health_multiplier: f32,
     }
-    
+
     #[test]
     fn default() {
         let mut h = Health {
@@ -25,9 +25,9 @@ mod tests {
             health_bonus: 3,
             health_multiplier: 1.5,
         };
-        
+
         h.reset_modifiers();
-        
+
         assert_eq!(
             h,
             Health {

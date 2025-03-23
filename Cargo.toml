@@ -8,6 +8,9 @@ categories = ["game-development", "data-structures"]
 [features]
 bevy = ["bevy_ecs", "bevy_app"]
 
+[workspace]
+members = ["immediate_stats_macros"]
+
 [dependencies]
 bevy_app = { version = "0.15.3", default-features = false, optional = true }
 bevy_ecs = { version = "0.15", default-features = false, optional = true }
