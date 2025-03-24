@@ -6,13 +6,14 @@ use quote::quote;
 use std::collections::HashMap;
 use syn::{Data, DeriveInput};
 
-#[proc_macro_derive(StatContainer, attributes(base, bonus, multiplier))]
+#[proc_macro_derive(StatContainer, attributes(base, bonus, multiplier, sub_stat))]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tree: DeriveInput = syn::parse(item).expect("A valid TokenStream");
 
     let struct_name = &tree.ident;
 
     let mut stats: HashMap<String, Stat> = HashMap::new();
+    let mut sub_stats = Vec::new();
 
     match tree.data {
         Data::Struct(s) => {
@@ -30,6 +31,9 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
                         continue;
                     };
                     let Ok(attr_type) = AttrType::try_from(attr_ident) else {
+                        if attr_ident.to_string() == "sub_stat" {
+                            sub_stats.push(field_ident.clone());
+                        }
                         continue;
                     };
 
@@ -77,6 +81,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
             fn reset_modifiers(&mut self) {
                 #(self.#bonuses = 0;)*
                 #(self.#multipliers = 1.0;)*
+                #(self.#sub_stats.reset_modifiers();)*
             }
         }
 

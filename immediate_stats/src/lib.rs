@@ -55,4 +55,34 @@ mod tests {
             21,
         );
     }
+
+    #[derive(StatContainer)]
+    struct SuperStat {
+        #[sub_stat]
+        health: Health,
+    }
+
+    #[test]
+    fn sub_stat_reset() {
+        for base in 0..10 {
+            let mut s = SuperStat {
+                health: Health {
+                    health_base: base,
+                    health_bonus: 3,
+                    health_multiplier: 1.5,
+                },
+            };
+
+            s.reset_modifiers();
+
+            assert_eq!(
+                s.health,
+                Health {
+                    health_base: base,
+                    health_bonus: 0,
+                    health_multiplier: 1.0,
+                },
+            );
+        }
+    }
 }
