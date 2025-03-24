@@ -1,7 +1,9 @@
+use proc_macro_error::{emit_call_site_warning, emit_warning, proc_macro_error};
 use quote::{ToTokens, quote};
 use syn::{Data, DeriveInput, Index};
 
 #[proc_macro_derive(StatContainer, attributes(stat))]
+#[proc_macro_error]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tree: DeriveInput = syn::parse(item).expect("A valid TokenStream");
 
@@ -28,10 +30,13 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
 
                     if ident.to_string() == "stat" {
                         if is_stat {
-                            // Todo Warn about unneeded attribute.
-                        } else {
-                            is_stat = true;
+                            emit_warning!(
+                                ident,
+                                "Unnecessary `stat` attribute. Fields of type `Stat` are automatically included."
+                            );
                         }
+
+                        is_stat = true;
                     }
                 }
 
@@ -51,6 +56,12 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         }
         Data::Enum(_) => todo!(),
         Data::Union(_) => unimplemented!(),
+    }
+
+    if stats.is_empty() && nums.is_empty() {
+        emit_call_site_warning!(
+            "Unused `StatContainer` derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
+        );
     }
 
     quote! {

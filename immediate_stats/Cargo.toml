@@ -9,8 +9,6 @@ repository = "https://github.com/AlephCubed/immediate_stats"
 license = "MIT OR Apache-2.0"
 
 [features]
-default = ["attribute_macro"]
-attribute_macro = ["immediate_stats_macros/attribute_macro"]
 bevy = ["bevy_ecs", "bevy_app"]
 
 [dependencies]

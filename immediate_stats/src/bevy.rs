@@ -1,6 +1,6 @@
 use crate::StatContainer;
 use bevy_app::{App, Plugin, PreUpdate};
-use bevy_ecs::prelude::*;
+use bevy_ecs::prelude::Component;
 use bevy_ecs::query::Without;
 use bevy_ecs::system::Query;
 use std::marker::PhantomData;
@@ -34,6 +34,7 @@ fn reset_modifiers<T: Component + StatContainer>(
 mod tests {
     use super::*;
     use crate::stat::Stat;
+    use bevy_ecs::prelude::World;
     use immediate_stats_macros::StatContainer;
 
     #[derive(Component, StatContainer, PartialEq, Debug)]
