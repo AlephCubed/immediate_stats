@@ -1,8 +1,9 @@
 use proc_macro_error::{emit_call_site_warning, emit_warning, proc_macro_error};
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
 
+// Todo Return one or the other.
 fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> (Vec<Ident>, Vec<Index>) {
     let mut names = Vec::new();
     let mut nums = Vec::new();
@@ -93,7 +94,7 @@ fn stat_container_enum(e: DataEnum) -> TokenStream {
 
     for variant in e.variants {
         let ident = variant.ident;
-        let (names, nums) = get_names_from_fields(variant.fields);
+        let (names, nums) = get_names_from_fields(variant.fields.clone());
 
         if !names.is_empty() {
             assert!(nums.is_empty());
@@ -105,7 +106,27 @@ fn stat_container_enum(e: DataEnum) -> TokenStream {
             });
         } else if !nums.is_empty() {
             assert!(names.is_empty());
-            todo!("Tuple enum variants")
+
+            let mut variables = Vec::new();
+
+            for index in 0..variant.fields.len() {
+                if nums.contains(&Index::from(index)) {
+                    variables.push(Ident::new(
+                        format!("{}", ('a' as u8 + index as u8) as char).as_str(),
+                        Span::call_site(),
+                    ))
+                } else {
+                    variables.push(Ident::new("_", Span::call_site()));
+                }
+            }
+
+            let used_vars = variables.iter().filter(|x| x.to_string() != "_");
+
+            cases.push(quote! {
+                Self::#ident(#(#variables,)*) => {
+                    #(#used_vars.reset_modifiers();)*
+                },
+            });
         }
     }
 

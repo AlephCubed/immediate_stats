@@ -81,8 +81,10 @@ mod tests {
     #[derive(StatContainer, PartialEq, Debug)]
     enum EnumStat {
         Named {
-            internal: Stat,
+            stat: Stat,
+            other: u8,
         },
+        Unnamed(Stat, u8),
         #[expect(dead_code)]
         Other,
     }
@@ -91,11 +93,12 @@ mod tests {
     fn reset_enum_named() {
         for base in 0..10 {
             let mut stat = EnumStat::Named {
-                internal: Stat {
+                stat: Stat {
                     base,
                     bonus: 3,
                     multiplier: 1.5,
                 },
+                other: 0,
             };
 
             stat.reset_modifiers();
@@ -103,9 +106,28 @@ mod tests {
             assert_eq!(
                 stat,
                 EnumStat::Named {
-                    internal: Stat::new(base)
+                    stat: Stat::new(base),
+                    other: 0,
                 }
             );
+        }
+    }
+
+    #[test]
+    fn reset_enum_unnamed() {
+        for base in 0..10 {
+            let mut stat = EnumStat::Unnamed(
+                Stat {
+                    base,
+                    bonus: 3,
+                    multiplier: 1.5,
+                },
+                0,
+            );
+
+            stat.reset_modifiers();
+
+            assert_eq!(stat, EnumStat::Unnamed(Stat::new(base), 0));
         }
     }
 }
