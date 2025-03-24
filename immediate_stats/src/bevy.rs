@@ -37,11 +37,11 @@ mod tests {
     use bevy_ecs::prelude::World;
     use immediate_stats_macros::StatContainer;
 
-    #[derive(Component, StatContainer, PartialEq, Debug)]
+    #[derive(Component, StatContainer, PartialEq, Debug, Clone)]
     struct Health(Stat);
 
     #[test]
-    fn plugin() {
+    fn reset() {
         let mut world = World::new();
         let system = world.register_system(reset_modifiers::<Health>);
 
@@ -59,5 +59,23 @@ mod tests {
             world.get::<Health>(entity),
             Some(Health(Stat::new(100))).as_ref()
         );
+    }
+
+    #[test]
+    fn pause_reset() {
+        let mut world = World::new();
+        let system = world.register_system(reset_modifiers::<Health>);
+
+        let health = Health(Stat {
+            base: 100,
+            bonus: 50,
+            multiplier: 2.0,
+        });
+
+        let entity = world.spawn((health.clone(), PauseStatReset)).id();
+
+        world.run_system(system).unwrap();
+
+        assert_eq!(world.get::<Health>(entity), Some(health).as_ref());
     }
 }
