@@ -1,4 +1,6 @@
-use proc_macro_error::{emit_call_site_warning, emit_warning, proc_macro_error};
+use proc_macro_error::{
+    emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
+};
 use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
@@ -61,7 +63,10 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
     let method = match tree.data {
         Data::Struct(s) => stat_container_struct(s),
         Data::Enum(e) => stat_container_enum(e),
-        Data::Union(_) => unimplemented!(),
+        Data::Union(_) => {
+            emit_call_site_error!("This trait cannot be derived for unions");
+            return proc_macro::TokenStream::new();
+        }
     };
 
     quote! {
@@ -77,7 +82,7 @@ fn stat_container_struct(s: DataStruct) -> TokenStream {
 
     if names.is_empty() && nums.is_empty() {
         emit_call_site_warning!(
-            "Unused `StatContainer` derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
+            "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
         );
     }
 

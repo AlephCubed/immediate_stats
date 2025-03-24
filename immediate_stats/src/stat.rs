@@ -1,7 +1,7 @@
 use crate::StatContainer;
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Stat {
     pub base: i32,
     pub bonus: i32,
