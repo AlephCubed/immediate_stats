@@ -1,3 +1,6 @@
+#[cfg(feature = "bevy")]
+pub mod bevy;
+
 pub trait StatContainer {
     /// Resets all stat bonuses to zero, and stat multipliers to one.
     fn reset_modifiers(&mut self);
