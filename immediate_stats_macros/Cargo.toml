@@ -2,9 +2,9 @@
 name = "immediate_stats_macros"
 version = "0.1.0"
 edition = "2024"
-description = "A crate for makeing immediate-mode stats."
+description = "A crate for making immediate-mode stats."
 categories = ["game-development", "data-structures"]
-keywords = ["game", "bevy", "stats"]
+keywords = ["game", "gamedev", "bevy", "stats", "proc-macro"]
 repository = "https://github.com/AlephCubed/immediate_stats"
 license = "MIT OR Apache-2.0"
 
