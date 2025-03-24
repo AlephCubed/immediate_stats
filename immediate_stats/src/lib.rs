@@ -77,4 +77,35 @@ mod tests {
             assert_eq!(health.max.0, Stat::new(base));
         }
     }
+
+    #[derive(StatContainer, PartialEq, Debug)]
+    enum EnumStat {
+        Named {
+            internal: Stat,
+        },
+        #[expect(dead_code)]
+        Other,
+    }
+
+    #[test]
+    fn reset_enum_named() {
+        for base in 0..10 {
+            let mut stat = EnumStat::Named {
+                internal: Stat {
+                    base,
+                    bonus: 3,
+                    multiplier: 1.5,
+                },
+            };
+
+            stat.reset_modifiers();
+
+            assert_eq!(
+                stat,
+                EnumStat::Named {
+                    internal: Stat::new(base)
+                }
+            );
+        }
+    }
 }
