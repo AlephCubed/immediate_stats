@@ -1,0 +1,19 @@
+[package]
+name = "immediate_stats"
+version = "0.1.0"
+edition = "2024"
+description = "A crate for makeing immediate-mode stats."
+categories = ["game-development", "data-structures"]
+keywords = ["game", "bevy", "stats"]
+repository = "https://github.com/AlephCubed/immediate_stats"
+license = "MIT OR Apache-2.0"
+
+[features]
+default = ["attribute_macro"]
+attribute_macro = ["immediate_stats_macros/attribute_macro"]
+bevy = ["bevy_ecs", "bevy_app"]
+
+[dependencies]
+bevy_app = { version = "0.15.3", default-features = false, optional = true }
+bevy_ecs = { version = "0.15", default-features = false, optional = true }
+immediate_stats_macros = { path = "../immediate_stats_macros", default-features = false }
