@@ -1,5 +1,6 @@
 #[cfg(feature = "bevy")]
 pub mod bevy;
+pub mod stat;
 
 pub trait StatContainer {
     /// Resets all stat bonuses to zero, and stat multipliers to one.
