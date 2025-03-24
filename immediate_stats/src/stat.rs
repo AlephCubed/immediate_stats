@@ -4,8 +4,8 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 #[derive(PartialEq, Debug, Clone)]
 pub struct Stat {
     pub base: i32,
-    bonus: i32,
-    multiplier: f32,
+    pub bonus: i32,
+    pub multiplier: f32,
 }
 
 impl Stat {
@@ -18,6 +18,16 @@ impl Stat {
 
     pub fn total(&self) -> i32 {
         ((self.base + self.bonus) as f32 * self.multiplier) as i32
+    }
+
+    pub fn with_bonus(mut self, bonus: i32) -> Self {
+        self.bonus = bonus;
+        self
+    }
+
+    pub fn with_multiplier(mut self, multiplier: f32) -> Self {
+        self.multiplier = multiplier;
+        self
     }
 }
 
@@ -155,28 +165,14 @@ mod tests {
             21
         )
     }
-    
+
     #[test]
     fn total_no_bonus() {
-        assert_eq!(
-            Stat {
-                base: 20,
-                multiplier: 0.5,
-                ..Default::default()
-            }.total(),
-            10
-        );
+        assert_eq!(Stat::new(20).with_multiplier(0.5).total(), 10);
     }
 
     #[test]
     fn total_no_multiplier() {
-        assert_eq!(
-            Stat {
-                base: 2,
-                bonus: 1,
-                ..Default::default()
-            }.total(),
-            3
-        );
+        assert_eq!(Stat::new(2).with_bonus(1).total(), 3);
     }
 }
