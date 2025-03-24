@@ -18,9 +18,6 @@ mod tests {
         speed: Stat,
     }
 
-    #[derive(StatContainer, PartialEq, Debug)]
-    struct Health(Stat);
-
     #[test]
     fn reset() {
         for base in 0..10 {
@@ -38,18 +35,46 @@ mod tests {
         }
     }
 
+    #[derive(StatContainer, PartialEq, Debug)]
+    struct MaxHealth(Stat);
+
     #[test]
     fn reset_tuple() {
         for base in 0..10 {
-            let mut health = Health(Stat {
+            let mut max_health = MaxHealth(Stat {
                 base,
                 bonus: 3,
                 multiplier: 1.5,
             });
 
+            max_health.reset_modifiers();
+
+            assert_eq!(max_health.0, Stat::new(base));
+        }
+    }
+
+    #[derive(StatContainer, PartialEq, Debug)]
+    struct Health {
+        #[stat]
+        max: MaxHealth,
+        current: i32,
+    }
+
+    #[test]
+    fn reset_with_attribute() {
+        for base in 0..10 {
+            let mut health = Health {
+                max: MaxHealth(Stat {
+                    base,
+                    bonus: 3,
+                    multiplier: 1.5,
+                }),
+                current: base,
+            };
+
             health.reset_modifiers();
 
-            assert_eq!(health.0, Stat::new(base));
+            assert_eq!(health.max.0, Stat::new(base));
         }
     }
 }
