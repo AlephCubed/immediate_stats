@@ -33,41 +33,30 @@ fn reset_modifiers<T: Component + StatContainer>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::stat::Stat;
     use immediate_stats_macros::StatContainer;
 
     #[derive(Component, StatContainer, PartialEq, Debug)]
-    struct Damage {
-        #[base(health)]
-        damage_base: i32,
-        #[bonus(health)]
-        damage_bonus: i32,
-        #[multiplier(health)]
-        damage_multiplier: f32,
-    }
+    struct Health(Stat);
 
     #[test]
     fn plugin() {
         let mut world = World::new();
-        let system = world.register_system(reset_modifiers::<Damage>);
+        let system = world.register_system(reset_modifiers::<Health>);
 
         let entity = world
-            .spawn(Damage {
-                damage_base: 100,
-                damage_bonus: 50,
-                damage_multiplier: 2.0,
-            })
+            .spawn(Health(Stat {
+                base: 100,
+                bonus: 50,
+                multiplier: 2.0,
+            }))
             .id();
 
         world.run_system(system).unwrap();
 
         assert_eq!(
-            world.get::<Damage>(entity),
-            Some(Damage {
-                damage_base: 100,
-                damage_bonus: 0,
-                damage_multiplier: 1.0,
-            })
-            .as_ref()
+            world.get::<Health>(entity),
+            Some(Health(Stat::new(100))).as_ref()
         );
     }
 }

@@ -10,80 +10,46 @@ pub trait StatContainer {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::stat::Stat;
     use immediate_stats_macros::StatContainer;
 
     #[derive(StatContainer, PartialEq, Debug)]
-    struct Health {
-        #[base(health)]
-        health_base: i32,
-        #[bonus(health)]
-        health_bonus: i32,
-        #[multiplier(health)]
-        health_multiplier: f32,
+    struct Movement {
+        speed: Stat,
     }
+
+    #[derive(StatContainer, PartialEq, Debug)]
+    struct Health(Stat);
 
     #[test]
     fn reset() {
         for base in 0..10 {
-            let mut h = Health {
-                health_base: base,
-                health_bonus: 3,
-                health_multiplier: 1.5,
+            let mut movement = Movement {
+                speed: Stat {
+                    base,
+                    bonus: 3,
+                    multiplier: 1.5,
+                },
             };
 
-            h.reset_modifiers();
+            movement.reset_modifiers();
 
-            assert_eq!(
-                h,
-                Health {
-                    health_base: base,
-                    health_bonus: 0,
-                    health_multiplier: 1.0,
-                },
-            );
+            assert_eq!(movement.speed, Stat::new(base));
         }
     }
 
     #[test]
-    fn calculate() {
-        assert_eq!(
-            Health {
-                health_base: 10,
-                health_bonus: 4,
-                health_multiplier: 1.5,
-            }
-            .health(),
-            21,
-        );
-    }
-
-    #[derive(StatContainer)]
-    struct SuperStat {
-        #[sub_stat]
-        health: Health,
-    }
-
-    #[test]
-    fn sub_stat_reset() {
+    fn reset_tuple() {
         for base in 0..10 {
-            let mut s = SuperStat {
-                health: Health {
-                    health_base: base,
-                    health_bonus: 3,
-                    health_multiplier: 1.5,
-                },
-            };
+            let mut health = Health(Stat {
+                base,
+                bonus: 3,
+                multiplier: 1.5,
+            });
 
-            s.reset_modifiers();
+            health.reset_modifiers();
 
-            assert_eq!(
-                s.health,
-                Health {
-                    health_base: base,
-                    health_bonus: 0,
-                    health_multiplier: 1.0,
-                },
-            );
+            assert_eq!(health.0, Stat::new(base));
         }
     }
 }
