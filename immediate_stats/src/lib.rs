@@ -16,6 +16,7 @@ mod tests {
     #[derive(StatContainer, PartialEq, Debug)]
     struct Movement {
         speed: Stat,
+        other: bool,
     }
 
     #[test]
@@ -27,25 +28,35 @@ mod tests {
                     bonus: 3,
                     multiplier: 1.5,
                 },
+                other: true,
             };
 
             movement.reset_modifiers();
 
-            assert_eq!(movement.speed, Stat::new(base));
+            assert_eq!(
+                movement,
+                Movement {
+                    speed: Stat::new(base),
+                    other: true
+                }
+            );
         }
     }
 
     #[derive(StatContainer, PartialEq, Debug)]
-    struct MaxHealth(Stat);
+    struct MaxHealth(Stat, bool);
 
     #[test]
     fn reset_tuple() {
         for base in 0..10 {
-            let mut max_health = MaxHealth(Stat {
-                base,
-                bonus: 3,
-                multiplier: 1.5,
-            });
+            let mut max_health = MaxHealth(
+                Stat {
+                    base,
+                    bonus: 3,
+                    multiplier: 1.5,
+                },
+                true,
+            );
 
             max_health.reset_modifiers();
 
@@ -64,11 +75,14 @@ mod tests {
     fn reset_with_attribute() {
         for base in 0..10 {
             let mut health = Health {
-                max: MaxHealth(Stat {
-                    base,
-                    bonus: 3,
-                    multiplier: 1.5,
-                }),
+                max: MaxHealth(
+                    Stat {
+                        base,
+                        bonus: 3,
+                        multiplier: 1.5,
+                    },
+                    true,
+                ),
                 current: base,
             };
 
