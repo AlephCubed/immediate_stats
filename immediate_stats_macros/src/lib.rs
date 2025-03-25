@@ -5,8 +5,122 @@ use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
 
-// Todo Return one or the other.
-fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> (Vec<Ident>, Vec<Index>) {
+#[proc_macro_derive(StatContainer, attributes(stat))]
+#[proc_macro_error]
+pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let tree: DeriveInput = syn::parse(item).expect("A valid TokenStream");
+
+    let struct_name = &tree.ident;
+
+    let method = match tree.data {
+        Data::Struct(s) => stat_container_struct(s),
+        Data::Enum(e) => stat_container_enum(e),
+        Data::Union(_) => {
+            emit_call_site_error!("This trait cannot be derived for unions");
+            return proc_macro::TokenStream::new();
+        }
+    };
+
+    quote! {
+        impl StatContainer for #struct_name {
+            #method
+        }
+    }
+    .into()
+}
+
+fn stat_container_struct(s: DataStruct) -> TokenStream {
+    match get_names_from_fields(s.fields) {
+        FieldAccess::Ident(names) => {
+            quote! {
+                fn reset_modifiers(&mut self) {
+                    #(self.#names.reset_modifiers();)*
+                }
+            }
+        }
+        FieldAccess::Index(nums) => {
+            quote! {
+                fn reset_modifiers(&mut self) {
+                    #(self.#nums.reset_modifiers();)*
+                }
+            }
+        }
+        FieldAccess::None => {
+            emit_call_site_warning!(
+                "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
+            );
+            TokenStream::new()
+        }
+    }
+}
+
+fn stat_container_enum(e: DataEnum) -> TokenStream {
+    let mut cases = Vec::new();
+
+    for variant in e.variants {
+        let ident = variant.ident;
+
+        match get_names_from_fields(variant.fields.clone()) {
+            FieldAccess::Ident(names) => {
+                cases.push(quote! {
+                    Self::#ident { #(#names,)* .. } => {
+                        #(#names.reset_modifiers();)*
+                    },
+                });
+            }
+            FieldAccess::Index(nums) => {
+                let mut variables = Vec::new();
+
+                for index in 0..variant.fields.len() {
+                    if nums.contains(&Index::from(index)) {
+                        variables.push(Ident::new(
+                            format!("{}", ('a' as u8 + index as u8) as char).as_str(),
+                            Span::call_site(),
+                        ))
+                    } else {
+                        variables.push(Ident::new("_", Span::call_site()));
+                    }
+                }
+
+                if variables.is_empty() {
+                    continue;
+                }
+
+                let used_vars = variables.iter().filter(|x| x.to_string() != "_");
+
+                cases.push(quote! {
+                    Self::#ident(#(#variables,)*) => {
+                        #(#used_vars.reset_modifiers();)*
+                    },
+                });
+            }
+            FieldAccess::None => {}
+        }
+    }
+
+    if cases.is_empty() {
+        emit_call_site_warning!(
+            "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
+        );
+    }
+
+    quote! {
+        fn reset_modifiers(&mut self) {
+            match self {
+                #(#cases)*
+                _ => {},
+            }
+        }
+    }
+}
+
+enum FieldAccess {
+    Ident(Vec<Ident>),
+    Index(Vec<Index>),
+    None,
+}
+
+fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> FieldAccess {
     let mut names = Vec::new();
     let mut nums = Vec::new();
 
@@ -50,97 +164,13 @@ fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> (Vec<Ident
         }
     }
 
-    (names, nums)
-}
+    assert!(names.is_empty() | nums.is_empty());
 
-#[proc_macro_derive(StatContainer, attributes(stat))]
-#[proc_macro_error]
-pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let tree: DeriveInput = syn::parse(item).expect("A valid TokenStream");
-
-    let struct_name = &tree.ident;
-
-    let method = match tree.data {
-        Data::Struct(s) => stat_container_struct(s),
-        Data::Enum(e) => stat_container_enum(e),
-        Data::Union(_) => {
-            emit_call_site_error!("This trait cannot be derived for unions");
-            return proc_macro::TokenStream::new();
-        }
-    };
-
-    quote! {
-        impl StatContainer for #struct_name {
-            #method
-        }
-    }
-    .into()
-}
-
-fn stat_container_struct(s: DataStruct) -> TokenStream {
-    let (names, nums) = get_names_from_fields(s.fields);
-
-    if names.is_empty() && nums.is_empty() {
-        emit_call_site_warning!(
-            "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
-        );
-    }
-
-    quote! {
-        fn reset_modifiers(&mut self) {
-            #(self.#names.reset_modifiers();)*
-            #(self.#nums.reset_modifiers();)*
-        }
-    }
-}
-
-fn stat_container_enum(e: DataEnum) -> TokenStream {
-    let mut cases = Vec::new();
-
-    for variant in e.variants {
-        let ident = variant.ident;
-        let (names, nums) = get_names_from_fields(variant.fields.clone());
-
-        if !names.is_empty() {
-            assert!(nums.is_empty());
-
-            cases.push(quote! {
-                Self::#ident { #(#names,)* .. } => {
-                    #(#names.reset_modifiers();)*
-                },
-            });
-        } else if !nums.is_empty() {
-            assert!(names.is_empty());
-
-            let mut variables = Vec::new();
-
-            for index in 0..variant.fields.len() {
-                if nums.contains(&Index::from(index)) {
-                    variables.push(Ident::new(
-                        format!("{}", ('a' as u8 + index as u8) as char).as_str(),
-                        Span::call_site(),
-                    ))
-                } else {
-                    variables.push(Ident::new("_", Span::call_site()));
-                }
-            }
-
-            let used_vars = variables.iter().filter(|x| x.to_string() != "_");
-
-            cases.push(quote! {
-                Self::#ident(#(#variables,)*) => {
-                    #(#used_vars.reset_modifiers();)*
-                },
-            });
-        }
-    }
-
-    quote! {
-        fn reset_modifiers(&mut self) {
-            match self {
-                #(#cases)*
-                _ => {},
-            }
-        }
+    if names.is_empty() {
+        FieldAccess::Index(nums)
+    } else if nums.is_empty() {
+        FieldAccess::Ident(names)
+    } else {
+        FieldAccess::None
     }
 }
