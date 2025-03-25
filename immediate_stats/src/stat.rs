@@ -1,10 +1,31 @@
 use crate::StatContainer;
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
+/// A stat that [resets] to a base value every iteration.
+///
+/// Temporary bonuses can be applied using [`+=`](add), [`-=`](sub), [`*=`](mul), and [`/=`](div).
+/// During [calculation](Stat::total),
+/// multiplication and division are always applied **after** addition and subtraction.
+/// These bonuses are reset when [`reset_modifiers`](reset) is called.
+///
+/// [reset]:StatContainer::reset_modifiers
+/// [add]:Stat::add_assign
+/// [sub]:Stat::sub_assign
+/// [mul]:Stat::mul_assign
+/// [div]:Stat::div_assign
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Stat {
+    /// The persistent value of the stat.
     pub base: i32,
+    /// Added to `base` during calculation and gets reset to zero every iteration.
+    /// This is added *before* `multiplier` is applied.
+    ///
+    /// Can be modified using [`Stat::add_assign`] and [`Stat::sub_assign`]
     pub bonus: i32,
+    /// Multiplies the `base` during calculation and gets reset to one every iteration.
+    /// This is applied *after* `bonus` is added.
+    ///
+    /// Can be modified using [`Stat::mul_assign`] and [`Stat::div_assign`]
     pub multiplier: f32,
 }
 
@@ -16,6 +37,7 @@ impl Stat {
         }
     }
 
+    /// Calculates the total value of the stat.
     pub fn total(&self) -> i32 {
         ((self.base + self.bonus) as f32 * self.multiplier) as i32
     }

@@ -114,12 +114,14 @@ fn stat_container_enum(e: DataEnum) -> TokenStream {
     }
 }
 
+/// The ways to identify fields.
 enum FieldAccess {
     Ident(Vec<Ident>),
     Index(Vec<Index>),
     None,
 }
 
+/// Returns a list of all fields that either have type `Stat` or are tagged with `#[stat]`.
 fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> FieldAccess {
     let mut names = Vec::new();
     let mut nums = Vec::new();

@@ -2,6 +2,11 @@
 pub mod bevy;
 pub mod stat;
 
+/// Types that contain stats that need to be reset.
+///
+/// It is recommended to use the [derive macro](macro) instead of implementing manually.
+///
+/// [macro]: immediate_stats_macros::StatContainer
 pub trait StatContainer {
     /// Resets all stat bonuses to zero, and stat multipliers to one.
     fn reset_modifiers(&mut self);
