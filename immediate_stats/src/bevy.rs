@@ -1,8 +1,11 @@
+#[cfg(feature = "bevy_butler")]
+mod butler;
+
 use crate::StatContainer;
 use bevy_app::{App, Plugin, PreUpdate};
-use bevy_ecs::prelude::Component;
+use bevy_ecs::prelude::{Component, ResMut};
 use bevy_ecs::query::Without;
-use bevy_ecs::system::Query;
+use bevy_ecs::system::{Query, Resource};
 use std::marker::PhantomData;
 
 /// [Resets](StatContainer::reset_modifiers) all stat modifiers for component `T` in [`PreUpdate`].
@@ -18,15 +21,21 @@ pub struct PauseStatReset;
 
 impl<T: Component + StatContainer> Plugin for ImmediateStatsPlugin<T> {
     fn build(&self, app: &mut App) {
-        app.add_systems(PreUpdate, reset_modifiers::<T>);
+        app.add_systems(PreUpdate, reset_component_modifiers::<T>);
     }
 }
 
-fn reset_modifiers<T: Component + StatContainer>(
+pub fn reset_component_modifiers<T: Component + StatContainer>(
     mut query: Query<&mut T, Without<PauseStatReset>>,
 ) {
     for mut stat in &mut query {
         stat.reset_modifiers();
+    }
+}
+
+pub fn reset_resource_modifiers<T: Resource + StatContainer>(res: Option<ResMut<T>>) {
+    if let Some(mut res) = res {
+        res.reset_modifiers();
     }
 }
 
@@ -43,7 +52,7 @@ mod tests {
     #[test]
     fn reset() {
         let mut world = World::new();
-        let system = world.register_system(reset_modifiers::<Health>);
+        let system = world.register_system(reset_component_modifiers::<Health>);
 
         let entity = world
             .spawn(Health(Stat {
@@ -64,7 +73,7 @@ mod tests {
     #[test]
     fn pause_reset() {
         let mut world = World::new();
-        let system = world.register_system(reset_modifiers::<Health>);
+        let system = world.register_system(reset_component_modifiers::<Health>);
 
         let health = Health(Stat {
             base: 100,

@@ -14,6 +14,7 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 /// [mul]:Stat::mul_assign
 /// [div]:Stat::div_assign
 #[derive(PartialEq, Debug, Copy, Clone)]
+#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
 pub struct Stat {
     /// The persistent value of the stat.
     pub base: i32,

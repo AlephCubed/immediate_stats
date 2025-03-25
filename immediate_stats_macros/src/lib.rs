@@ -1,3 +1,6 @@
+#[cfg(feature = "bevy_butler")]
+mod bevy_butler;
+
 use proc_macro_error::{
     emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
 };
@@ -12,7 +15,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
 
     let struct_name = &tree.ident;
 
-    let method = match tree.data {
+    let method = match tree.data.clone() {
         Data::Struct(s) => stat_container_struct(s),
         Data::Enum(e) => stat_container_enum(e),
         Data::Union(_) => {
@@ -21,12 +24,20 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         }
     };
 
-    quote! {
+    let result = quote! {
         impl StatContainer for #struct_name {
             #method
         }
+    };
+
+    #[cfg(feature = "bevy_butler")]
+    {
+        let systems = bevy_butler::register_butler_systems(&tree);
+        quote! { #result #systems }.into()
     }
-    .into()
+
+    #[cfg(not(feature = "bevy_butler"))]
+    result.into()
 }
 
 fn stat_container_struct(s: DataStruct) -> TokenStream {

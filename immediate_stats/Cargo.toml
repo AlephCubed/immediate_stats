@@ -10,9 +10,12 @@ license = "MIT OR Apache-2.0"
 authors = ["AlephCubed"]
 
 [features]
-bevy = ["bevy_ecs", "bevy_app"]
+bevy = ["bevy_ecs", "bevy_app", "bevy_reflect"]
+bevy_butler = ["bevy", "bevy-butler", "immediate_stats_macros/bevy_butler"]
 
 [dependencies]
-bevy_app = { version = "0.15.3", default-features = false, optional = true }
+bevy_app = { version = "0.15", default-features = false, optional = true }
+bevy-butler = { version = "0.5.7", optional = true }
 bevy_ecs = { version = "0.15", default-features = false, optional = true }
+bevy_reflect = { version = "0.15", default-features = false, optional = true }
 immediate_stats_macros = { path = "../immediate_stats_macros", default-features = false }
