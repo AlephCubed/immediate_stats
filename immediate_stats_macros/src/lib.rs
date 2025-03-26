@@ -30,22 +30,22 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
 }
 
 fn stat_container_struct(s: DataStruct) -> TokenStream {
-    match get_names_from_fields(s.fields) {
-        FieldAccess::Ident(names) => {
+    match get_members_from_fields(s.fields) {
+        MemberVec::Named(names) => {
             quote! {
                 fn reset_modifiers(&mut self) {
                     #(self.#names.reset_modifiers();)*
                 }
             }
         }
-        FieldAccess::Index(nums) => {
+        MemberVec::Unnamed(nums) => {
             quote! {
                 fn reset_modifiers(&mut self) {
                     #(self.#nums.reset_modifiers();)*
                 }
             }
         }
-        FieldAccess::None => {
+        MemberVec::None => {
             emit_call_site_warning!(
                 "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
             );
@@ -60,15 +60,15 @@ fn stat_container_enum(e: DataEnum) -> TokenStream {
     for variant in e.variants {
         let ident = variant.ident;
 
-        match get_names_from_fields(variant.fields.clone()) {
-            FieldAccess::Ident(names) => {
+        match get_members_from_fields(variant.fields.clone()) {
+            MemberVec::Named(names) => {
                 cases.push(quote! {
                     Self::#ident { #(#names,)* .. } => {
                         #(#names.reset_modifiers();)*
                     },
                 });
             }
-            FieldAccess::Index(nums) => {
+            MemberVec::Unnamed(nums) => {
                 let mut variables = Vec::new();
 
                 for index in 0..variant.fields.len() {
@@ -94,7 +94,7 @@ fn stat_container_enum(e: DataEnum) -> TokenStream {
                     },
                 });
             }
-            FieldAccess::None => {}
+            MemberVec::None => {}
         }
     }
 
@@ -115,14 +115,14 @@ fn stat_container_enum(e: DataEnum) -> TokenStream {
 }
 
 /// The ways to identify fields.
-enum FieldAccess {
-    Ident(Vec<Ident>),
-    Index(Vec<Index>),
+enum MemberVec {
+    Named(Vec<Ident>),
+    Unnamed(Vec<Index>),
     None,
 }
 
 /// Returns a list of all fields that either have type `Stat` or are tagged with `#[stat]`.
-fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> FieldAccess {
+fn get_members_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> MemberVec {
     let mut names = Vec::new();
     let mut nums = Vec::new();
 
@@ -136,14 +136,14 @@ fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> FieldAcces
 
         for attr in &field.attrs {
             let path = attr.meta.path();
-            let Some(ident) = path.get_ident() else {
+            let Some(attr_ident) = path.get_ident() else {
                 continue;
             };
 
-            if ident.to_string() == "stat" {
+            if attr_ident.to_string() == "stat" {
                 if is_stat {
                     emit_warning!(
-                        ident,
+                        attr_ident,
                         "Unnecessary `stat` attribute. Fields of type `Stat` are automatically included."
                     );
                 }
@@ -169,10 +169,10 @@ fn get_names_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> FieldAcces
     assert!(names.is_empty() | nums.is_empty());
 
     if names.is_empty() {
-        FieldAccess::Index(nums)
+        MemberVec::Unnamed(nums)
     } else if nums.is_empty() {
-        FieldAccess::Ident(names)
+        MemberVec::Named(names)
     } else {
-        FieldAccess::None
+        MemberVec::None
     }
 }
