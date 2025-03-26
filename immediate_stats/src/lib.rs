@@ -52,7 +52,7 @@ mod tests {
     struct MaxHealth(Stat, bool);
 
     #[test]
-    fn reset_tuple() {
+    fn reset_tuple_struct() {
         for base in 0..10 {
             let mut max_health = MaxHealth(
                 Stat {
@@ -98,7 +98,7 @@ mod tests {
     }
 
     #[derive(StatContainer, PartialEq, Debug)]
-    struct IgnoreTest {
+    struct PartialReset {
         #[stat_ignore]
         ignored: Stat,
         reset: Stat,
@@ -113,15 +113,15 @@ mod tests {
                 multiplier: 1.5,
             };
 
-            let mut health = IgnoreTest {
+            let mut partial = PartialReset {
                 ignored: stat,
                 reset: stat,
             };
 
-            health.reset_modifiers();
+            partial.reset_modifiers();
 
-            assert_eq!(health.ignored, stat);
-            assert_eq!(health.reset, Stat::new(base));
+            assert_eq!(partial.ignored, stat);
+            assert_eq!(partial.reset, Stat::new(base));
         }
     }
 
