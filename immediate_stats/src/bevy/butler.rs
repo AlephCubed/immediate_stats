@@ -53,6 +53,9 @@ mod tests {
 
         app.update();
 
-        assert_eq!(*app.world().resource::<Health>(), Health(Stat::new(100)));
+        assert_eq!(
+            app.world().get_resource::<Health>(),
+            Some(Health(Stat::new(100))).as_ref()
+        );
     }
 }
