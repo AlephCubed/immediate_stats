@@ -50,7 +50,7 @@ mod tests {
     struct Health(Stat);
 
     #[test]
-    fn reset() {
+    fn reset_component() {
         let mut world = World::new();
         let system = world.register_system(reset_component_modifiers::<Health>);
 
@@ -71,7 +71,7 @@ mod tests {
     }
 
     #[test]
-    fn pause_reset() {
+    fn pause_component() {
         let mut world = World::new();
         let system = world.register_system(reset_component_modifiers::<Health>);
 
