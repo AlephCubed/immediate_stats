@@ -5,7 +5,7 @@ use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
 
-#[proc_macro_derive(StatContainer, attributes(stat))]
+#[proc_macro_derive(StatContainer, attributes(stat, stat_ignore))]
 #[proc_macro_error]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tree: DeriveInput = syn::parse(item).expect("A valid TokenStream");
@@ -134,6 +134,8 @@ fn get_members_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> MemberVe
             is_stat = true;
         }
 
+        let mut explicit_stat: Option<Ident> = None;
+
         for attr in &field.attrs {
             let path = attr.meta.path();
             let Some(attr_ident) = path.get_ident() else {
@@ -149,6 +151,25 @@ fn get_members_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> MemberVe
                 }
 
                 is_stat = true;
+                explicit_stat = Some(attr_ident.clone());
+            }
+        }
+
+        for attr in &field.attrs {
+            let path = attr.meta.path();
+            let Some(attr_ident) = path.get_ident() else {
+                continue;
+            };
+
+            if attr_ident.to_string() == "stat_ignore" {
+                if let Some(explicit_ident) = &explicit_stat {
+                    emit_warning!(
+                        explicit_ident,
+                        "`stat` attribute is overruled by `stat_ignore` attribute."
+                    );
+                }
+
+                is_stat = false;
             }
         }
 

@@ -98,6 +98,34 @@ mod tests {
     }
 
     #[derive(StatContainer, PartialEq, Debug)]
+    struct IgnoreTest {
+        #[stat_ignore]
+        ignored: Stat,
+        reset: Stat,
+    }
+
+    #[test]
+    fn reset_ignored() {
+        for base in 0..10 {
+            let stat = Stat {
+                base,
+                bonus: 3,
+                multiplier: 1.5,
+            };
+
+            let mut health = IgnoreTest {
+                ignored: stat,
+                reset: stat,
+            };
+
+            health.reset_modifiers();
+
+            assert_eq!(health.ignored, stat);
+            assert_eq!(health.reset, Stat::new(base));
+        }
+    }
+
+    #[derive(StatContainer, PartialEq, Debug)]
     enum EnumStat {
         Named {
             stat: Stat,
