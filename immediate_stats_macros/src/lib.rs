@@ -8,7 +8,7 @@ use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
 
-#[proc_macro_derive(StatContainer, attributes(stat, stat_ignore))]
+#[proc_macro_derive(StatContainer, attributes(stat, stat_ignore, stat_butler_component))]
 #[proc_macro_error]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tree: DeriveInput = syn::parse(item).expect("TokenStream must be valid.");

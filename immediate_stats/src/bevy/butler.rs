@@ -11,9 +11,33 @@ mod tests {
     #[butler_plugin]
     struct MyPlugin;
 
-    #[derive(Reflect, Resource, StatContainer, Default, PartialEq, Debug)]
+    #[derive(Reflect, Resource, Component, StatContainer, Default, PartialEq, Debug)]
+    #[stat_butler_component(plugin = MyPlugin)]
     #[resource(plugin = MyPlugin)]
     struct Health(Stat);
+
+    #[test]
+    fn reset_component_auto() {
+        let mut app = App::new();
+
+        app.add_plugins(MyPlugin);
+
+        let entity = app
+            .world_mut()
+            .spawn(Health(Stat {
+                base: 100,
+                bonus: 50,
+                multiplier: 2.0,
+            }))
+            .id();
+
+        app.update();
+
+        assert_eq!(
+            app.world().get::<Health>(entity),
+            Some(Health(Stat::new(100))).as_ref()
+        );
+    }
 
     #[test]
     fn reset_resource_auto() {
