@@ -8,7 +8,7 @@ use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
 #[proc_macro_derive(StatContainer, attributes(stat, stat_ignore))]
 #[proc_macro_error]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let tree: DeriveInput = syn::parse(item).expect("A valid TokenStream");
+    let tree: DeriveInput = syn::parse(item).expect("TokenStream must be valid.");
 
     let struct_name = &tree.ident;
 
@@ -16,7 +16,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         Data::Struct(s) => stat_container_struct(s),
         Data::Enum(e) => stat_container_enum(e),
         Data::Union(_) => {
-            emit_call_site_error!("This trait cannot be derived for unions");
+            emit_call_site_error!("This trait cannot be derived for unions.");
             return proc_macro::TokenStream::new();
         }
     };
@@ -122,6 +122,7 @@ enum MemberVec {
 }
 
 /// Returns a list of all fields that either have type `Stat` or are tagged with `#[stat]`.
+/// If they are tagged with `#[stat_ignore]`, they are removed from the list.
 fn get_members_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> MemberVec {
     let mut names = Vec::new();
     let mut nums = Vec::new();
@@ -130,47 +131,44 @@ fn get_members_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> MemberVe
         // Check if the field is a stat.
         let mut is_stat = false;
 
+        // Check if type is `Stat`.
         if field.ty.to_token_stream().to_string() == "Stat" {
             is_stat = true;
         }
 
+        // Store the `#[stat]` ident. Used for warning when overridden by `#[stat_ignore]`.
         let mut explicit_stat: Option<Ident> = None;
 
-        for attr in &field.attrs {
-            let path = attr.meta.path();
-            let Some(attr_ident) = path.get_ident() else {
-                continue;
-            };
+        // Iterator over all ident attributes.
+        let attr_ident_iter = field.attrs.iter().filter_map(|x| x.meta.path().get_ident());
 
-            if attr_ident.to_string() == "stat" {
-                if is_stat {
-                    emit_warning!(
-                        attr_ident,
-                        "Unnecessary `stat` attribute. Fields of type `Stat` are automatically included."
-                    );
-                }
-
-                is_stat = true;
-                explicit_stat = Some(attr_ident.clone());
+        // Check for `#[stat]` attribute.
+        if let Some(attr_ident) = attr_ident_iter.clone().find(|x| x.to_string() == "stat") {
+            if is_stat {
+                emit_warning!(
+                    attr_ident,
+                    "Unnecessary `stat` attribute. Fields of type `Stat` are automatically included."
+                );
             }
+
+            is_stat = true;
+            explicit_stat = Some(attr_ident.clone());
         }
 
-        for attr in &field.attrs {
-            let path = attr.meta.path();
-            let Some(attr_ident) = path.get_ident() else {
-                continue;
-            };
-
-            if attr_ident.to_string() == "stat_ignore" {
-                if let Some(explicit_ident) = &explicit_stat {
-                    emit_warning!(
-                        explicit_ident,
-                        "`stat` attribute is overruled by `stat_ignore` attribute."
-                    );
-                }
-
-                is_stat = false;
+        // Check for `#[stat_ignore]` attribute.
+        if attr_ident_iter
+            .clone()
+            .find(|x| x.to_string() == "stat_ignore")
+            .is_some()
+        {
+            if let Some(explicit_ident) = &explicit_stat {
+                emit_warning!(
+                    explicit_ident,
+                    "`stat` attribute is overruled by `stat_ignore` attribute."
+                );
             }
+
+            is_stat = false;
         }
 
         if !is_stat {
