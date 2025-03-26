@@ -2,28 +2,14 @@
 mod butler;
 
 use crate::StatContainer;
-use bevy_app::{App, Plugin, PreUpdate};
 use bevy_ecs::prelude::{Component, ResMut};
 use bevy_ecs::query::Without;
 use bevy_ecs::system::{Query, Resource};
-use std::marker::PhantomData;
-
-/// [Resets](StatContainer::reset_modifiers) all stat modifiers for component `T` in [`PreUpdate`].
-#[derive(Default)]
-pub struct ImmediateStatsPlugin<T: Component + StatContainer> {
-    phantom_data: PhantomData<T>,
-}
 
 /// Prevents all [`StatContainers`](StatContainer) from resetting.
 #[derive(Component, Default)]
 #[component(storage = "SparseSet")]
 pub struct PauseStatReset;
-
-impl<T: Component + StatContainer> Plugin for ImmediateStatsPlugin<T> {
-    fn build(&self, app: &mut App) {
-        app.add_systems(PreUpdate, reset_component_modifiers::<T>);
-    }
-}
 
 pub fn reset_component_modifiers<T: Component + StatContainer>(
     mut query: Query<&mut T, Without<PauseStatReset>>,
