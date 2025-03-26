@@ -1,4 +1,3 @@
-use proc_macro_error::emit_call_site_warning;
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{DeriveInput, Token};
@@ -31,10 +30,8 @@ pub(super) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
                     input.parse::<Token![=]>().expect("An equals sign.");
                     let input = input.parse::<proc_macro2::Ident>().expect("An identifier.");
                     
-                    emit_call_site_warning!("{:?}", input);
-                    
                     systems.push(quote! {
-                        #[bevy_butler::system(generics = <#input>, plugin = #path, schedule = bevy_app::PreUpdate)]
+                        #[bevy_butler::system(generics = <#struct_name>, plugin = #input, schedule = bevy_app::PreUpdate)]
                         use crate::bevy::reset_resource_modifiers;
                     });
                     
