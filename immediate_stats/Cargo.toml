@@ -10,7 +10,7 @@ license = "MIT OR Apache-2.0"
 authors = ["AlephCubed"]
 
 [features]
-bevy = ["bevy_ecs", "bevy_app", "bevy_reflect"]
+bevy = ["bevy_ecs", "bevy_app", "bevy_reflect", "immediate_stats_macros/bevy"]
 bevy_butler = ["bevy", "bevy-butler", "immediate_stats_macros/bevy_butler"]
 
 [dependencies]

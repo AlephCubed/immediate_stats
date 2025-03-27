@@ -1,5 +1,5 @@
 #[cfg(feature = "bevy_butler")]
-mod butler;
+pub mod butler;
 
 use crate::StatContainer;
 use bevy_ecs::prelude::{Component, ResMut};

@@ -2,7 +2,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{DeriveInput, Token};
 
-pub(super) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
+pub(crate) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
     let mut systems = Vec::new();
 
     for attr in &tree.attrs {

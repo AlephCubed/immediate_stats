@@ -13,7 +13,8 @@ authors = ["AlephCubed"]
 proc-macro = true
 
 [features]
-bevy_butler = []
+bevy = []
+bevy_butler = ["bevy"]
 
 [dependencies]
 proc-macro2 = "1.0"

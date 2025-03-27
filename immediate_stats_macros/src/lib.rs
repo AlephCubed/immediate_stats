@@ -1,5 +1,5 @@
-#[cfg(feature = "bevy_butler")]
-mod bevy_butler;
+#[cfg(feature = "bevy")]
+mod bevy;
 
 use proc_macro_error::{
     emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
@@ -32,7 +32,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
 
     #[cfg(feature = "bevy_butler")]
     {
-        let systems = bevy_butler::register_butler_systems(&tree);
+        let systems = bevy::butler::register_butler_systems(&tree);
         quote! { #result #systems }.into()
     }
 
