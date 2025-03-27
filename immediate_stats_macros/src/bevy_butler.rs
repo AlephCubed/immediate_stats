@@ -15,8 +15,10 @@ pub(super) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
         };
 
         let use_system = match ident.to_string().as_str() {
-            "resource" => quote! { use crate::bevy::reset_resource_modifiers; },
-            "stat_butler_component" => quote! { use crate::bevy::reset_component_modifiers; },
+            "resource" => quote! { use immediate_stats::bevy::reset_resource_modifiers; },
+            "stat_butler_component" => {
+                quote! { use immediate_stats::bevy::reset_component_modifiers; }
+            }
             _ => continue,
         };
 

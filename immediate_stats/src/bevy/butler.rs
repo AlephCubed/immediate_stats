@@ -8,6 +8,8 @@ mod tests {
     use bevy_reflect::prelude::*;
     use immediate_stats_macros::StatContainer;
 
+    use crate as immediate_stats;
+
     #[butler_plugin]
     struct MyPlugin;
 
