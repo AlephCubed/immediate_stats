@@ -14,8 +14,8 @@ bevy = ["bevy_ecs", "bevy_app", "bevy_reflect", "immediate_stats_macros/bevy"]
 bevy_butler = ["bevy", "bevy-butler", "immediate_stats_macros/bevy_butler"]
 
 [dependencies]
-bevy_app = { version = "0.15", default-features = false, optional = true }
-bevy-butler = { version = "0.5.7", optional = true }
-bevy_ecs = { version = "0.15", default-features = false, optional = true }
-bevy_reflect = { version = "0.15", default-features = false, optional = true }
+bevy_app = { version = "0.16.0-rc.2", default-features = false, optional = true }
+bevy-butler = { version = "0.6.1-alpha.1", optional = true }
+bevy_ecs = { version = "0.16.0-rc.2", default-features = false, optional = true }
+bevy_reflect = { version = "0.16.0-rc.2", default-features = false, optional = true }
 immediate_stats_macros = { path = "../immediate_stats_macros", default-features = false }

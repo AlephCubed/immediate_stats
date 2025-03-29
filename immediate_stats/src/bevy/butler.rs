@@ -14,8 +14,8 @@ mod tests {
     struct MyPlugin;
 
     #[derive(Reflect, Resource, Component, StatContainer, Default, PartialEq, Debug)]
-    #[stat_butler_component(plugin = MyPlugin)]
-    #[resource(plugin = MyPlugin)]
+    #[add_component(plugin = MyPlugin)]
+    #[add_resource(plugin = MyPlugin)]
     struct Health(Stat);
 
     #[test]

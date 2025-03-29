@@ -15,8 +15,8 @@ pub(crate) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
         };
 
         let use_system = match ident.to_string().as_str() {
-            "resource" => quote! { use immediate_stats::bevy::reset_resource_modifiers; },
-            "stat_butler_component" => {
+            "add_resource" => quote! { use immediate_stats::bevy::reset_resource_modifiers; },
+            "add_component" => {
                 quote! { use immediate_stats::bevy::reset_component_modifiers; }
             }
             _ => continue,
@@ -37,7 +37,7 @@ pub(crate) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
             let input = input.parse::<proc_macro2::Ident>().expect("An identifier.");
 
             systems.push(quote! {
-                #[bevy_butler::system(generics = <#struct_name>, plugin = #input, schedule = bevy_app::PreUpdate)]
+                #[bevy_butler::add_system(generics = <#struct_name>, plugin = #input, schedule = bevy_app::PreUpdate)]
                 #use_system
             });
 

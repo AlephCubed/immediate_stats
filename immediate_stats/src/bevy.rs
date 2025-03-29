@@ -2,16 +2,15 @@
 pub mod butler;
 
 use crate::StatContainer;
-use bevy_ecs::prelude::{Component, ResMut};
-use bevy_ecs::query::Without;
-use bevy_ecs::system::{Query, Resource};
+use bevy_ecs::component::Mutable;
+use bevy_ecs::prelude::{Component, Query, ResMut, Resource, Without};
 
 /// Prevents all [`StatContainers`](StatContainer) from resetting.
 #[derive(Component, Default)]
 #[component(storage = "SparseSet")]
 pub struct PauseStatReset;
 
-pub fn reset_component_modifiers<T: Component + StatContainer>(
+pub fn reset_component_modifiers<T: Component<Mutability = Mutable> + StatContainer>(
     mut query: Query<&mut T, Without<PauseStatReset>>,
 ) {
     for mut stat in &mut query {
