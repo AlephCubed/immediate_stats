@@ -37,7 +37,7 @@ pub(crate) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
             let input = input.parse::<proc_macro2::Ident>().expect("An identifier.");
 
             systems.push(quote! {
-                #[bevy_butler::add_system(generics = <#struct_name>, plugin = #input, schedule = bevy_app::PreUpdate)]
+                #[bevy_butler::add_system(generics = <#struct_name>, plugin = #input, schedule = immediate_stats::PreUpdate)]
                 #use_system
             });
 

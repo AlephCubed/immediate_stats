@@ -1,14 +1,12 @@
 #[cfg(test)]
 mod tests {
+    use crate as immediate_stats;
     use crate::StatContainer;
     use crate::stat::Stat;
     use bevy_app::App;
     use bevy_butler::*;
     use bevy_ecs::prelude::*;
     use bevy_reflect::prelude::*;
-    use immediate_stats_macros::StatContainer;
-
-    use crate as immediate_stats;
 
     #[butler_plugin]
     struct MyPlugin;

@@ -2,6 +2,7 @@
 pub mod bevy;
 pub mod stat;
 
+pub use bevy_app::prelude::PreUpdate;
 pub use immediate_stats_macros::StatContainer;
 
 /// Types that contain stats that need to be reset.
