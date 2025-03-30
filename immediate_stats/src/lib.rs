@@ -2,6 +2,8 @@
 pub mod bevy;
 pub mod stat;
 
+pub use immediate_stats_macros::StatContainer;
+
 /// Types that contain stats that need to be reset.
 ///
 /// It is recommended to use the [derive macro](macro) instead of implementing manually.
