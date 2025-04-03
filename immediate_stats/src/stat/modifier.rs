@@ -14,6 +14,20 @@ impl Modifier {
     pub fn new(bonus: i32, multiplier: f32) -> Self {
         Self { bonus, multiplier }
     }
+
+    pub fn from_bonus(bonus: i32) -> Self {
+        Self {
+            bonus,
+            ..Self::default()
+        }
+    }
+
+    pub fn from_multiplier(multiplier: f32) -> Self {
+        Self {
+            multiplier,
+            ..Self::default()
+        }
+    }
 }
 
 impl Default for Modifier {

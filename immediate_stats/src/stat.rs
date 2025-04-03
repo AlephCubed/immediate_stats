@@ -1,8 +1,8 @@
+pub mod modifier;
+
 use crate::StatContainer;
 use crate::stat::modifier::Modifier;
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
-
-mod modifier;
 
 /// A stat that [resets] to a base value every iteration.
 ///
