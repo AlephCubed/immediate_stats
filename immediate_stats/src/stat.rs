@@ -1,5 +1,8 @@
 use crate::StatContainer;
+use crate::stat::modifier::Modifier;
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+
+mod modifier;
 
 /// A stat that [resets] to a base value every iteration.
 ///
@@ -51,6 +54,21 @@ impl Stat {
     pub fn with_multiplier(mut self, multiplier: f32) -> Self {
         self.multiplier = multiplier;
         self
+    }
+
+    /// Sets the bonus and multiplier to the [`Modifier`] values.
+    pub fn with_modifier(mut self, modifier: Modifier) -> Self {
+        self.bonus = modifier.bonus;
+        self.multiplier = modifier.multiplier;
+        self
+    }
+
+    /// Applies the [`Modifier`] values to the bonus and multiplier.
+    ///
+    /// This adds the bonuses, and multiplies the multipliers.
+    pub fn apply(&mut self, modifier: Modifier) {
+        self.bonus += modifier.bonus;
+        self.multiplier *= modifier.multiplier;
     }
 }
 
@@ -197,5 +215,27 @@ mod tests {
     #[test]
     fn total_no_multiplier() {
         assert_eq!(Stat::new(2).with_bonus(1).total(), 3);
+    }
+
+    #[test]
+    fn total_with_modifier() {
+        assert_eq!(Stat::new(5).with_modifier(Modifier::new(1, 0.5)).total(), 3);
+    }
+
+    #[test]
+    fn apply() {
+        let mut stat = Stat::new(10);
+
+        stat.apply(Modifier::new(2, 2.0));
+        stat.apply(Modifier::new(3, 4.0));
+
+        assert_eq!(
+            stat,
+            Stat {
+                base: 10,
+                bonus: 5,
+                multiplier: 8.0,
+            }
+        )
     }
 }
