@@ -98,6 +98,7 @@ dependencies = [
  "bevy_derive",
  "bevy_ecs",
  "bevy_platform_support",
+ "bevy_reflect",
  "bevy_tasks",
  "bevy_utils",
  "cfg-if",
@@ -127,6 +128,7 @@ dependencies = [
  "bevy_ecs_macros",
  "bevy_platform_support",
  "bevy_ptr",
+ "bevy_reflect",
  "bevy_tasks",
  "bevy_utils",
  "bitflags",
@@ -220,6 +222,7 @@ dependencies = [
  "erased-serde",
  "foldhash",
  "serde",
+ "smallvec",
  "thiserror",
  "variadics_please",
 ]
