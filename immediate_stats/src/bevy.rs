@@ -2,6 +2,8 @@
 pub mod butler;
 
 use crate::StatContainer;
+use crate::stat::Stat;
+use crate::stat::modifier::Modifier;
 use bevy_app::{App, Plugin};
 use bevy_ecs::component::Mutable;
 use bevy_ecs::prelude::ReflectComponent;
@@ -13,14 +15,16 @@ pub struct ImmediateStatesPlugin;
 
 impl Plugin for ImmediateStatesPlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<PauseStatReset>();
+        app.register_type::<PauseStatReset>()
+            .register_type::<Stat>()
+            .register_type::<Modifier>();
     }
 }
 
 /// Prevents a [`StatContainers`](StatContainer) from resetting.
-#[derive(Component, Reflect, Default, Eq, PartialEq)]
+#[derive(Component, Reflect, Eq, PartialEq, Debug, Default, Clone)]
 #[component(storage = "SparseSet")]
-#[reflect(Component, Default)]
+#[reflect(Component, PartialEq, Debug, Default, Clone)]
 pub struct PauseStatReset;
 
 pub fn reset_component_modifiers<T: Component<Mutability = Mutable> + StatContainer>(
