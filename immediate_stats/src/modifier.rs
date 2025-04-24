@@ -1,3 +1,5 @@
+//! Contains a modifier that can be applied to [`Stat`](crate::Stat).
+
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 /// Modifier values that can be applied to a [`super::Stat`].
@@ -15,10 +17,12 @@ pub struct Modifier {
 }
 
 impl Modifier {
+    /// Creates a new modifier from a bonus and a multiplier.
     pub fn new(bonus: i32, multiplier: f32) -> Self {
         Self { bonus, multiplier }
     }
 
+    /// Creates a new modifier from a bonus.
     pub fn from_bonus(bonus: i32) -> Self {
         Self {
             bonus,
@@ -26,6 +30,7 @@ impl Modifier {
         }
     }
 
+    /// Creates a new modifier from a multiplier.
     pub fn from_multiplier(multiplier: f32) -> Self {
         Self {
             multiplier,

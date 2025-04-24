@@ -1,19 +1,21 @@
+//! Contains the basic stat object.
+
 use crate::StatContainer;
 use crate::modifier::Modifier;
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
-/// A stat that [resets] to a base value every iteration.
+/// A stat that [resets][reset] to a base value every iteration.
 ///
-/// Temporary bonuses can be applied using [`+=`](add), [`-=`](sub), [`*=`](mul), and [`/=`](div).
+/// Temporary bonuses can be applied using [`+=`][add], [`-=`][sub], [`*=`][mul], and [`/=`][div].
 /// During [calculation](Stat::total),
 /// multiplication and division are always applied **after** addition and subtraction.
-/// These bonuses are reset when [`reset_modifiers`](reset) is called.
+/// These bonuses are reset when [`reset_modifiers`][reset] is called.
 ///
-/// [reset]:StatContainer::reset_modifiers
-/// [add]:Stat::add_assign
-/// [sub]:Stat::sub_assign
-/// [mul]:Stat::mul_assign
-/// [div]:Stat::div_assign
+/// [reset]: StatContainer::reset_modifiers
+/// [add]: Stat::add_assign
+/// [sub]: Stat::sub_assign
+/// [mul]: Stat::mul_assign
+/// [div]: Stat::div_assign
 #[derive(PartialEq, Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "bevy",
@@ -36,6 +38,7 @@ pub struct Stat {
 }
 
 impl Stat {
+    /// Creates a new modifier from a base value.
     pub fn new(base: i32) -> Self {
         Self {
             base,
@@ -48,17 +51,19 @@ impl Stat {
         ((self.base + self.bonus) as f32 * self.multiplier) as i32
     }
 
+    /// A builder that overwrites the current bonus with a new value.
     pub fn with_bonus(mut self, bonus: i32) -> Self {
         self.bonus = bonus;
         self
     }
 
+    /// A builder that overwrites the multiplier bonus with a new value.
     pub fn with_multiplier(mut self, multiplier: f32) -> Self {
         self.multiplier = multiplier;
         self
     }
 
-    /// Sets the bonus and multiplier to the [`Modifier`] values.
+    /// A builder that overwrites the current bonus and multiplier with a new value.
     pub fn with_modifier(mut self, modifier: Modifier) -> Self {
         self.bonus = modifier.bonus;
         self.multiplier = modifier.multiplier;

@@ -39,7 +39,6 @@ struct Speed(Stat);
 
 fn main() {
     App::new()
-        .add_plugins(ImmediateStatesPlugin)
         .add_systems(PreUpdate, (
             reset_component_modifiers::<Speed>,
             reset_resource_modifiers::<Speed>,

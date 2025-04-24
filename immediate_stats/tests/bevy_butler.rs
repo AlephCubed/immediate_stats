@@ -1,5 +1,5 @@
-#![cfg(feature = "bevy_butler")]
 //! Tests the `add_component` attribute for automatic system registration.
+#![cfg(feature = "bevy_butler")]
 
 use crate::StatContainer;
 use crate::stat::Stat;

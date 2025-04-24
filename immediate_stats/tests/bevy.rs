@@ -1,5 +1,5 @@
-#![cfg(feature = "bevy")]
 //! Tests the reset systems and `PauseStatReset`.
+#![cfg(feature = "bevy")]
 
 use bevy_ecs::prelude::*;
 use immediate_stats::*;
@@ -63,4 +63,11 @@ fn reset_resource() {
         world.get_resource::<Health>(),
         Some(Health(Stat::new(100))).as_ref()
     );
+}
+
+#[test]
+fn reset_resource_not_present() {
+    let mut world = World::new();
+    let system = world.register_system(reset_resource_modifiers::<Health>);
+    world.run_system(system).unwrap();
 }
