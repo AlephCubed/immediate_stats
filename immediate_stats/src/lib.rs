@@ -5,15 +5,14 @@ pub mod bevy;
 pub mod modifier;
 pub mod stat;
 
-// Todo Move into internal module called `__internal` like Bevy Butler.
-#[cfg(feature = "bevy")]
-pub use bevy_app::prelude::PreUpdate;
 pub use immediate_stats_macros::StatContainer;
+pub use modifier::*;
+pub use stat::*;
 
 #[cfg(feature = "bevy")]
 pub use bevy::*;
-pub use modifier::*;
-pub use stat::*;
+#[cfg(feature = "bevy")]
+pub use bevy_app::prelude::PreUpdate;
 
 /// Types that contain stats that need to be reset.
 ///
