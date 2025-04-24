@@ -1,9 +1,17 @@
+#![doc = include_str!("../README.md")]
+
 #[cfg(feature = "bevy")]
 pub mod bevy;
 pub mod stat;
 
+// Todo Move into internal module called `__internal` like Bevy Butler.
+#[cfg(feature = "bevy")]
 pub use bevy_app::prelude::PreUpdate;
 pub use immediate_stats_macros::StatContainer;
+
+#[cfg(feature = "bevy")]
+pub use bevy::*;
+pub use stat::*;
 
 /// Types that contain stats that need to be reset.
 ///

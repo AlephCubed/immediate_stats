@@ -2,8 +2,11 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 /// Modifier values that can be applied to a [`super::Stat`].
 #[derive(PartialEq, Debug, Copy, Clone)]
-#[cfg_attr(feature = "bevy", derive(bevy_reflect::Reflect))]
-#[reflect(PartialEq, Debug, Clone)]
+#[cfg_attr(
+    feature = "bevy",
+    derive(bevy_reflect::Reflect),
+    reflect(PartialEq, Debug, Clone)
+)]
 pub struct Modifier {
     /// Added to `base` of a [`super::Stat`] during calculation.
     pub bonus: i32,

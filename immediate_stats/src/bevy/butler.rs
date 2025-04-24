@@ -6,12 +6,11 @@ mod tests {
     use bevy_app::App;
     use bevy_butler::*;
     use bevy_ecs::prelude::*;
-    use bevy_reflect::prelude::*;
 
     #[butler_plugin]
     struct MyPlugin;
 
-    #[derive(Reflect, Resource, Component, StatContainer, Default, PartialEq, Debug)]
+    #[derive(Resource, Component, StatContainer, Default, PartialEq, Debug)]
     #[add_component(plugin = MyPlugin)]
     #[add_resource(plugin = MyPlugin)]
     struct Health(Stat);
