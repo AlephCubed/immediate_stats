@@ -4,9 +4,7 @@ Game stats that reset every frame. Inspired by immediate mode rendering.
 
 == Todo Info about derive macro.
 
-```rust no_run
-use immediate_stats::*;
-
+```rust
 #[derive(StatContainer)]
 struct Speed(Stat);
 
@@ -29,11 +27,7 @@ fn main() {
 There is build-in integration with the [Bevy Engine](https://bevyengine.org) via the `bevy` feature flag.
 This adds systems for resetting `StatContainer` components and resources.
 
-```rust ignore
-use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
-use immediate_stats::*;
-
+```rust
 #[derive(StatContainer, Component, Resource)]
 struct Speed(Stat);
 
@@ -52,12 +46,7 @@ fn main() {
 If you use [Bevy Butler](https://github.com/TGRCdev/bevy-butler/), you can also use the `bevy_butler` feature flag.
 This automatically registers the required system(s) using the `add_component` attribute.
 
-```rust ignore
-use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
-use immediate_stats::*;
-use bevy_butler::*;
-
+```rust
 #[butler_plugin]
 struct MyPlugin;
 
