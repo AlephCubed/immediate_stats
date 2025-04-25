@@ -1,9 +1,11 @@
-use darling::FromMeta;
+use darling::ast::NestedMeta;
+use darling::{Error, FromMeta};
 use proc_macro::{self, TokenStream};
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident, quote};
-use syn::{DeriveInput, Path, parse_macro_input};
+use syn::{DeriveInput, Expr, Meta, Path, parse_macro_input};
 
+// Todo Fix error handling and add documentation.
 pub fn register_systems(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     let struct_name = &input.ident;
@@ -21,11 +23,6 @@ pub fn register_systems(input: TokenStream) -> TokenStream {
     }
 
     butler_attributes.into_token_stream().into()
-}
-
-#[derive(FromMeta)]
-pub struct PluginPath {
-    pub plugin: Path,
 }
 
 pub struct ButlerAttributes<'a> {
@@ -48,7 +45,7 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         if let Some(plugin_path) = &self.component_plugin {
             let ident = &self.ident;
-            let plugin = &plugin_path.plugin;
+            let plugin = &plugin_path.0;
             let use_as = format_ident!("__{ident}_component");
 
             tokens.extend(quote! {
@@ -59,7 +56,7 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
 
         if let Some(plugin_path) = &self.resource_plugin {
             let ident = &self.ident;
-            let plugin = &plugin_path.plugin;
+            let plugin = &plugin_path.0;
             let use_as = format_ident!("__{ident}_resource");
 
             tokens.extend(quote! {
@@ -67,5 +64,44 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
                 use immediate_stats::bevy::reset_resource_modifiers as #use_as;
             });
         }
+    }
+}
+
+/// Represents a `plugin(PATH)` or `plugin = PATH` attribute meta.
+pub struct PluginPath(pub Path);
+
+impl FromMeta for PluginPath {
+    fn from_list(items: &[NestedMeta]) -> darling::Result<Self> {
+        for item in items {
+            return match item {
+                NestedMeta::Meta(meta) => match meta {
+                    Meta::Path(_) => Err(Error::custom("Expected a value for `plugin`")),
+                    Meta::List(list) => {
+                        if list.path.require_ident()? != "plugin" {
+                            continue;
+                        }
+
+                        let mut path = None;
+
+                        list.parse_nested_meta(|value_meta| {
+                            path = Some(value_meta.path);
+                            Ok(())
+                        })?;
+
+                        match path {
+                            None => Err(Error::custom("Expected `plugin` attribute")),
+                            Some(path) => Ok(PluginPath(path)),
+                        }
+                    }
+                    Meta::NameValue(name_value) => match &name_value.value {
+                        Expr::Path(p) => Ok(PluginPath(p.path.clone())),
+                        _ => Err(Error::custom("Expected a path to a butler plugin")),
+                    },
+                },
+                NestedMeta::Lit(_) => Err(Error::custom("Expected `plugin` attribute")),
+            };
+        }
+
+        Err(Error::custom("Expected `plugin` attribute"))
     }
 }

@@ -58,3 +58,51 @@ fn reset_resource_auto() {
         Some(Health(Stat::new(100))).as_ref()
     );
 }
+
+#[derive(Resource, Component, StatContainer, Default, PartialEq, Debug)]
+#[add_component(plugin(MyPlugin))]
+#[add_resource(plugin(MyPlugin))]
+struct AlternateSyntax(Stat);
+
+#[test]
+fn reset_component_auto_alternate_syntax() {
+    let mut app = App::new();
+
+    app.add_plugins(MyPlugin);
+
+    let entity = app
+        .world_mut()
+        .spawn(AlternateSyntax(Stat {
+            base: 100,
+            bonus: 50,
+            multiplier: 2.0,
+        }))
+        .id();
+
+    app.update();
+
+    assert_eq!(
+        app.world().get::<AlternateSyntax>(entity),
+        Some(AlternateSyntax(Stat::new(100))).as_ref()
+    );
+}
+
+#[test]
+fn reset_resource_auto_alternate_syntax() {
+    let mut app = App::new();
+
+    app.add_plugins(MyPlugin);
+
+    app.insert_resource(AlternateSyntax(Stat {
+        base: 100,
+        bonus: 50,
+        multiplier: 2.0,
+    }));
+
+    app.update();
+
+    assert_eq!(
+        app.world().get_resource::<AlternateSyntax>(),
+        Some(AlternateSyntax(Stat::new(100))).as_ref()
+    );
+}
