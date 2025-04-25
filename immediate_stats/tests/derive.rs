@@ -2,9 +2,17 @@
 
 use immediate_stats::*;
 
+#[derive(PartialEq, Debug)]
+struct MyStat;
+
+impl StatContainer for MyStat {
+    fn reset_modifiers(&mut self) {}
+}
+
 #[derive(StatContainer, PartialEq, Debug)]
 struct Movement {
     speed: Stat,
+    custom: MyStat,
     other: bool,
 }
 
@@ -17,6 +25,7 @@ fn reset() {
                 bonus: 3,
                 multiplier: 1.5,
             },
+            custom: MyStat,
             other: true,
         };
 
@@ -26,6 +35,7 @@ fn reset() {
             movement,
             Movement {
                 speed: Stat::new(base),
+                custom: MyStat,
                 other: true
             }
         );

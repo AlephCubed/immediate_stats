@@ -99,8 +99,8 @@ pub mod stat;
 /// }
 /// ```
 /// # Configuration
-/// By default, it will consider any value of type `Stat` to be a sub-stat.
-/// You can use `#[stat]` to add a sub-stat and `#[stat_ignore]` to ignore one.
+/// By default, it will consider any field whose type contains "Stat" to be a sub-stat.
+/// You can use `#[stat]` to add other sub-stats and `#[stat_ignore]` to ignore one.
 /// ```rust
 /// # use immediate_stats::*;
 /// # #[derive(StatContainer, Default, Debug, PartialEq)]
