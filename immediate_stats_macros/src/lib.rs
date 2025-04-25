@@ -1,6 +1,7 @@
 #[cfg(feature = "bevy")]
 mod bevy;
 
+use crate::bevy::butler::register_systems;
 use proc_macro_error::{
     emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
 };
@@ -8,10 +9,13 @@ use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
 
-#[proc_macro_derive(StatContainer, attributes(stat, stat_ignore, add_component))]
+#[proc_macro_derive(
+    StatContainer,
+    attributes(stat, stat_ignore, add_component, add_resource)
+)]
 #[proc_macro_error]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let tree: DeriveInput = syn::parse(item).expect("TokenStream must be valid.");
+    let tree: DeriveInput = syn::parse(item.clone()).expect("TokenStream must be valid.");
 
     let struct_name = &tree.ident;
 
@@ -32,7 +36,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
 
     #[cfg(feature = "bevy_butler")]
     {
-        let systems = bevy::butler::register_butler_systems(&tree);
+        let systems: TokenStream = register_systems(item).into();
         quote! { #result #systems }.into()
     }
 

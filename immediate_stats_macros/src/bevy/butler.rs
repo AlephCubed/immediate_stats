@@ -1,51 +1,71 @@
-use proc_macro2::{Ident, Span, TokenStream};
-use quote::quote;
-use syn::{DeriveInput, Token};
+use darling::FromMeta;
+use proc_macro::{self, TokenStream};
+use proc_macro2::Ident;
+use quote::{ToTokens, format_ident, quote};
+use syn::{DeriveInput, Path, parse_macro_input};
 
-pub(crate) fn register_butler_systems(tree: &DeriveInput) -> TokenStream {
-    let mut systems = Vec::new();
+pub fn register_systems(input: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(input as DeriveInput);
+    let struct_name = &input.ident;
 
-    for attr in &tree.attrs {
-        let struct_name = &tree.ident;
+    let mut butler_attributes = ButlerAttributes::new(struct_name);
 
-        let path = attr.meta.path();
-
-        let Some(ident) = path.get_ident() else {
-            continue;
-        };
-
-        let use_system = match ident.to_string().as_str() {
-            "add_resource" => quote! { use immediate_stats::bevy::reset_resource_modifiers },
-            "add_component" => {
-                quote! { use immediate_stats::bevy::reset_component_modifiers }
-            }
-            _ => continue,
-        };
-
-        attr.parse_nested_meta(|meta| {
-            let Some(var_name) = meta.path.segments.first() else {
-                return Ok(())
-            };
-
-            if var_name.ident.to_string() != "plugin" {
-                return Ok(())
-            };
-
-            let input = &meta.input;
-
-            input.parse::<Token![=]>().expect("An equals sign.");
-            let input = input.parse::<proc_macro2::Ident>().expect("An identifier.");
-
-            let use_as = Ident::new(&format!("__{struct_name}_{ident}"), Span::call_site());
-
-            systems.push(quote! {
-                #[bevy_butler::add_system(generics = <#struct_name>, plugin = #input, schedule = immediate_stats::PreUpdate)]
-                #use_system as #use_as;
-            });
-
-            Ok(())
-        }).unwrap();
+    for attr in input.attrs {
+        if attr.path().is_ident("add_component") {
+            let plugin = PluginPath::from_meta(&attr.meta).unwrap();
+            butler_attributes.component_plugin = Some(plugin);
+        } else if attr.path().is_ident("add_resource") {
+            let plugin = PluginPath::from_meta(&attr.meta).unwrap();
+            butler_attributes.resource_plugin = Some(plugin);
+        }
     }
 
-    quote! { #(#systems)* }
+    butler_attributes.into_token_stream().into()
+}
+
+#[derive(FromMeta)]
+pub struct PluginPath {
+    pub plugin: Path,
+}
+
+pub struct ButlerAttributes<'a> {
+    ident: &'a Ident,
+    component_plugin: Option<PluginPath>,
+    resource_plugin: Option<PluginPath>,
+}
+
+impl<'a> ButlerAttributes<'a> {
+    pub fn new(ident: &'a Ident) -> Self {
+        Self {
+            ident,
+            component_plugin: None,
+            resource_plugin: None,
+        }
+    }
+}
+
+impl<'a> ToTokens for ButlerAttributes<'a> {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        if let Some(plugin_path) = &self.component_plugin {
+            let ident = &self.ident;
+            let plugin = &plugin_path.plugin;
+            let use_as = format_ident!("__{ident}_component");
+
+            tokens.extend(quote! {
+                #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
+                use immediate_stats::bevy::reset_component_modifiers as #use_as;
+            });
+        }
+
+        if let Some(plugin_path) = &self.resource_plugin {
+            let ident = &self.ident;
+            let plugin = &plugin_path.plugin;
+            let use_as = format_ident!("__{ident}_resource");
+
+            tokens.extend(quote! {
+                #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
+                use immediate_stats::bevy::reset_resource_modifiers as #use_as;
+            });
+        }
+    }
 }
