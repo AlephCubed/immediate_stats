@@ -2,7 +2,7 @@
 name = "immediate_stats_macros"
 version = "0.1.0"
 edition = "2024"
-description = "A crate for making immediate-mode stats."
+description = "Game stats that reset every frame. Inspired by immediate mode rendering."
 categories = ["game-development", "data-structures"]
 keywords = ["game", "gamedev", "bevy", "stats", "proc-macro"]
 repository = "https://github.com/AlephCubed/immediate_stats"

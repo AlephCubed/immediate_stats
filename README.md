@@ -1,8 +1,7 @@
 # Immediate Stats
 
 Game stats that reset every frame. Inspired by immediate mode rendering.
-
-== Todo Info about derive macro.
+Includes a derive macro which propagates stat resets to any stat fields.
 
 ```rust
 #[derive(StatContainer)]
