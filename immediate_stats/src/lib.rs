@@ -1,7 +1,8 @@
 //! Game stats that reset every frame.
 //! Inspired by immediate mode rendering.
 //!
-//! == Todo Info about derive macro.
+//! Includes a [derive macro](macro@StatContainer) which propagates stat resets to any stat fields.
+//!
 //! ```rust no_run
 //! # use immediate_stats::*;
 //! #[derive(StatContainer)]
@@ -16,7 +17,7 @@
 //!         // The order does not matter. Bonuses are always applied before multipliers.
 //!         assert_eq!(speed.0.total(), 30); // (10 + 5) * 2 = 30
 //!
-//!         speed.reset_modifiers(); // Reset bonus and multiplier, so speed is back to 10.
+//!         speed.reset_modifiers(); // Reset speed back to 10.
 //!     }
 //! }
 //! ```
@@ -25,7 +26,7 @@
 //!
 //! There is build-in integration with the [Bevy Engine](https://bevyengine.org)
 //! via the `bevy` feature flag.
-//! This adds systems for resetting `StatContainer` components and resources.
+//! This adds systems for resetting [`StatContainer`] components and resources.
 //!
 #![cfg_attr(not(feature = "bevy"), doc = "```rust ignore")]
 #![cfg_attr(feature = "bevy", doc = "```rust")]
@@ -77,7 +78,7 @@ pub mod modifier;
 pub mod stat;
 
 /// Implements [`reset_modifiers`](StatContainer::reset_modifiers)
-/// by passing on the call to any sub-stats.
+/// by propagating the call down to any `StatContainer` fields.
 /// ```rust
 /// # use immediate_stats::*;
 /// #[derive(StatContainer, Default, Debug, PartialEq)]
@@ -98,8 +99,8 @@ pub mod stat;
 /// }
 /// ```
 /// # Configuration
-/// By default, it will consider any value of type `Stat` to be a sub-stat.
-/// You can use `#[stat]` to add a sub-stat and `#[stat_ignore]` to ignore one.
+/// By default, it will consider any field whose type contains "Stat" to be a sub-stat.
+/// You can use `#[stat]` to add other sub-stats and `#[stat_ignore]` to ignore one.
 /// ```rust
 /// # use immediate_stats::*;
 /// # #[derive(StatContainer, Default, Debug, PartialEq)]
@@ -110,9 +111,9 @@ pub mod stat;
 /// #[derive(StatContainer)]
 /// struct PartialReset {
 ///     #[stat]
-///     custom: Health,
+///     custom: Health, // Will get reset.
 ///     #[stat_ignore]
-///     ignored: Stat,
+///     ignored: Stat, // Will not get reset.
 /// }
 ///
 /// fn main () {

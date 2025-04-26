@@ -2,7 +2,7 @@
 name = "immediate_stats"
 version = "0.1.0"
 edition = "2024"
-description = "A crate for making immediate-mode stats."
+description = "Game stats that reset every frame. Inspired by immediate mode rendering."
 categories = ["game-development", "data-structures"]
 keywords = ["game", "gamedev", "bevy", "stats", "proc-macro"]
 repository = "https://github.com/AlephCubed/immediate_stats"
@@ -14,14 +14,14 @@ bevy = ["bevy_ecs", "bevy_app", "bevy_reflect", "immediate_stats_macros/bevy"]
 bevy_butler = ["bevy", "bevy-butler", "immediate_stats_macros/bevy_butler"]
 
 [dependencies]
-bevy_app = { version = "0.16.0-rc", default-features = false, optional = true, features = [
+bevy_app = { version = "0.16.0", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
 bevy-butler = { version = "0.6.1-alpha", optional = true }
-bevy_ecs = { version = "0.16.0-rc", default-features = false, optional = true, features = [
+bevy_ecs = { version = "0.16.0", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
-bevy_reflect = { version = "0.16.0-rc", default-features = false, optional = true }
+bevy_reflect = { version = "0.16.0", default-features = false, optional = true }
 immediate_stats_macros = { path = "../immediate_stats_macros", default-features = false }
 
 [lints.rust]

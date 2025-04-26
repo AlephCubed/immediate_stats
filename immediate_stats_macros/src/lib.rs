@@ -143,7 +143,7 @@ fn get_members_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> MemberVe
         let mut is_stat = false;
 
         // Check if type is `Stat`.
-        if field.ty.to_token_stream().to_string() == "Stat" {
+        if field.ty.to_token_stream().to_string().contains("Stat") {
             is_stat = true;
         }
 
