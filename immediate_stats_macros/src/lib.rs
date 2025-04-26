@@ -8,7 +8,7 @@ use proc_macro_error::{
 use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::spanned::Spanned;
-use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index, parse_macro_input};
+use syn::{Data, DataEnum, DeriveInput, Field, Fields, Ident, Index, parse_macro_input};
 
 #[proc_macro_derive(StatContainer, attributes(stat, stat_ignore, add_component))]
 #[proc_macro_error]
@@ -18,7 +18,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
     let struct_name = &tree.ident;
 
     let method_contents = match tree.data.clone() {
-        Data::Struct(s) => struct_fields(s).unwrap(),
+        Data::Struct(s) => reset_fields(&s.fields).unwrap(),
         Data::Enum(e) => stat_container_enum(e),
         Data::Union(_) => {
             emit_call_site_error!("This trait cannot be derived from unions.");
@@ -80,25 +80,24 @@ impl FromField for FieldOptions {
     }
 }
 
-fn struct_fields(s: DataStruct) -> darling::Result<TokenStream> {
-    let mut tokens = TokenStream::new();
-    for (index, field) in s.fields.iter().enumerate() {
-        let field_state = FieldOptions::from_field(&field)?;
+/// Returns the code needed to reset any stat fields.
+fn reset_fields(fields: &Fields) -> darling::Result<TokenStream> {
+    for (index, field) in fields.iter().enumerate() {
+        let options = FieldOptions::from_field(&field)?;
 
-        if (field_state.include || field_state.stat_type) && !field_state.exclude {
-            if let Some(ident) = field_state.ident {
-                tokens.extend(quote! {
-                    self.#ident.reset_modifiers();
-                });
-            } else {
-                let index = Index::from(index);
-                tokens.extend(quote! {
-                    self.#index.reset_modifiers();
-                });
-            }
+        if (options.include || options.stat_type) && !options.exclude {
+            return Ok(match options.ident {
+                Some(ident) => {
+                    quote! { self.#ident.reset_modifiers(); }
+                }
+                None => {
+                    let index = Index::from(index);
+                    quote! { self.#index.reset_modifiers(); }
+                }
+            });
         }
 
-        if field_state.include && field_state.exclude {
+        if options.include && options.exclude {
             emit_warning!(
                 field.span(),
                 "`stat` attribute is overruled by `stat_ignore` attribute."
@@ -106,7 +105,7 @@ fn struct_fields(s: DataStruct) -> darling::Result<TokenStream> {
         }
     }
 
-    Ok(tokens)
+    Ok(TokenStream::new())
 }
 
 fn stat_container_enum(e: DataEnum) -> TokenStream {
