@@ -1,25 +1,24 @@
 #[cfg(feature = "bevy_butler")]
 mod bevy_butler;
 
+use darling::FromField;
 use proc_macro_error::{
     emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
 };
 use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
-use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index, parse_macro_input};
+use syn::spanned::Spanned;
+use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index, Type, parse_macro_input};
 
-#[proc_macro_derive(
-    StatContainer,
-    attributes(stat, stat_ignore, add_component, add_resource)
-)]
+#[proc_macro_derive(StatContainer, attributes(stat, stat_ignore, add_component))]
 #[proc_macro_error]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let tree: DeriveInput = parse_macro_input!(item as DeriveInput);
 
     let struct_name = &tree.ident;
 
-    let method = match tree.data.clone() {
-        Data::Struct(s) => stat_container_struct(s),
+    let method_contents = match tree.data.clone() {
+        Data::Struct(s) => struct_fields(s).unwrap(),
         Data::Enum(e) => stat_container_enum(e),
         Data::Union(_) => {
             emit_call_site_error!("This trait cannot be derived from unions.");
@@ -27,9 +26,11 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         }
     };
 
-    let result = quote! {
+    let method = quote! {
         impl StatContainer for #struct_name {
-            #method
+            fn reset_modifiers(&mut self) {
+                #method_contents
+            }
         }
     };
 
@@ -38,38 +39,59 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         let systems = bevy_butler::register_systems(tree);
 
         match systems {
-            Ok(systems) => quote! { #result #systems }.into(),
+            Ok(systems) => quote! { #method #systems }.into(),
             Err(e) => e.write_errors().into(),
         }
     }
 
     #[cfg(not(feature = "bevy_butler"))]
-    result.into()
+    method.into()
 }
 
-fn stat_container_struct(s: DataStruct) -> TokenStream {
-    match get_members_from_fields(s.fields) {
-        MemberVec::Named(names) => {
-            quote! {
-                fn reset_modifiers(&mut self) {
-                    #(self.#names.reset_modifiers();)*
-                }
+#[derive(FromField)] // Todo Implement manually to allow for naked attributes.
+#[darling(attributes(stat, stat_ignore))]
+struct FieldState {
+    ident: Option<Ident>,
+    ty: Type,
+    #[darling(default, rename = "stat")]
+    include: bool,
+    #[darling(default, rename = "stat")]
+    exclude: bool,
+}
+
+fn struct_fields(s: DataStruct) -> darling::Result<TokenStream> {
+    let mut tokens = TokenStream::new();
+    for (index, field) in s.fields.iter().enumerate() {
+        let field_state = FieldState::from_field(&field)?;
+
+        let is_stat_type = field_state
+            .ty
+            .to_token_stream()
+            .to_string()
+            .contains("Stat");
+
+        if (field_state.include || is_stat_type) && !field_state.exclude {
+            if let Some(ident) = field_state.ident {
+                tokens.extend(quote! {
+                    self.#ident.reset_modifiers();
+                });
+            } else {
+                let index = Index::from(index);
+                tokens.extend(quote! {
+                    self.#index.reset_modifiers();
+                });
             }
         }
-        MemberVec::Unnamed(nums) => {
-            quote! {
-                fn reset_modifiers(&mut self) {
-                    #(self.#nums.reset_modifiers();)*
-                }
-            }
-        }
-        MemberVec::None => {
-            emit_call_site_warning!(
-                "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
+
+        if field_state.include && field_state.exclude {
+            emit_warning!(
+                field.span(),
+                "`stat` attribute is overruled by `stat_ignore` attribute."
             );
-            TokenStream::new()
         }
     }
+
+    Ok(tokens)
 }
 
 fn stat_container_enum(e: DataEnum) -> TokenStream {
@@ -123,11 +145,9 @@ fn stat_container_enum(e: DataEnum) -> TokenStream {
     }
 
     quote! {
-        fn reset_modifiers(&mut self) {
-            match self {
-                #(#cases)*
-                _ => {},
-            }
+        match self {
+            #(#cases)*
+            _ => {},
         }
     }
 }
