@@ -2,13 +2,13 @@
 mod bevy_butler;
 
 use darling::{Error, FromField};
+use proc_macro2::{Span, TokenStream};
 use proc_macro_error::{
     emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
 };
-use proc_macro2::{Span, TokenStream};
-use quote::{ToTokens, quote};
+use quote::{quote, ToTokens};
 use syn::spanned::Spanned;
-use syn::{Data, DataEnum, DeriveInput, Field, Fields, Ident, Index, parse_macro_input};
+use syn::{parse_macro_input, Data, DataEnum, DeriveInput, Field, Ident, Index};
 
 #[proc_macro_derive(StatContainer, attributes(stat, stat_ignore, add_component))]
 #[proc_macro_error]
@@ -18,7 +18,11 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
     let struct_name = &tree.ident;
 
     let method_contents = match tree.data.clone() {
-        Data::Struct(s) => reset_fields(&s.fields).unwrap_or_else(Error::write_errors),
+        Data::Struct(s) => {
+            s.fields.iter().enumerate().map(|(index, field)| {
+                reset_field(field, index).unwrap_or_else(Error::write_errors)
+            }).flatten().collect()
+        },
         Data::Enum(e) => stat_container_enum(e),
         Data::Union(_) => {
             emit_call_site_error!("This trait cannot be derived from unions.");
@@ -80,31 +84,29 @@ impl FromField for FieldOptions {
     }
 }
 
-/// Returns the code needed to reset any stat fields.
-fn reset_fields(fields: &Fields) -> darling::Result<TokenStream> {
-    for (index, field) in fields.iter().enumerate() {
-        let options = FieldOptions::from_field(&field)?;
+/// Returns the code needed to reset a field. `index` is used for tuple fields.
+fn reset_field(field: &Field, index: usize) -> darling::Result<TokenStream> {
+    let options = FieldOptions::from_field(&field)?;
 
-        if (options.include || options.stat_type) && !options.exclude {
-            return Ok(match options.ident {
-                Some(ident) => {
-                    quote! { self.#ident.reset_modifiers(); }
-                }
-                None => {
-                    let index = Index::from(index);
-                    quote! { self.#index.reset_modifiers(); }
-                }
-            });
-        }
-
-        if options.include && options.exclude {
-            emit_warning!(
-                field.span(),
-                "`stat` attribute is overruled by `stat_ignore` attribute."
-            );
-        }
+    if (options.include || options.stat_type) && !options.exclude {
+        return Ok(match options.ident {
+            Some(ident) => {
+                quote! { self.#ident.reset_modifiers(); }
+            }
+            None => {
+                let index = Index::from(index);
+                quote! { self.#index.reset_modifiers(); }
+            }
+        });
     }
 
+    if options.include && options.exclude {
+        emit_warning!(
+            field.span(),
+            "`stat` attribute is overruled by `stat_ignore` attribute."
+        );
+    }
+    
     Ok(TokenStream::new())
 }
 
