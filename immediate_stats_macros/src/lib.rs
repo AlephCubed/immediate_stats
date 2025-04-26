@@ -1,7 +1,7 @@
 #[cfg(feature = "bevy_butler")]
 mod bevy_butler;
 
-use darling::FromField;
+use darling::{Error, FromField};
 use proc_macro_error::{
     emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
 };
@@ -18,7 +18,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
     let struct_name = &tree.ident;
 
     let method_contents = match tree.data.clone() {
-        Data::Struct(s) => reset_fields(&s.fields).unwrap(),
+        Data::Struct(s) => reset_fields(&s.fields).unwrap_or_else(Error::write_errors),
         Data::Enum(e) => stat_container_enum(e),
         Data::Union(_) => {
             emit_call_site_error!("This trait cannot be derived from unions.");
