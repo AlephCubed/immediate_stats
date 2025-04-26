@@ -8,7 +8,7 @@ use proc_macro_error::{
 use proc_macro2::{Span, TokenStream};
 use quote::{ToTokens, quote};
 use syn::spanned::Spanned;
-use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index, Type, parse_macro_input};
+use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index, parse_macro_input};
 
 #[proc_macro_derive(StatContainer, attributes(stat, stat_ignore, add_component))]
 #[proc_macro_error]
@@ -48,29 +48,44 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
     method.into()
 }
 
-#[derive(FromField)] // Todo Implement manually to allow for naked attributes.
-#[darling(attributes(stat, stat_ignore))]
-struct FieldState {
+#[derive(Default)]
+struct FieldOptions {
     ident: Option<Ident>,
-    ty: Type,
-    #[darling(default, rename = "stat")]
+    stat_type: bool,
     include: bool,
-    #[darling(default, rename = "stat")]
     exclude: bool,
+}
+
+impl FromField for FieldOptions {
+    fn from_field(field: &Field) -> darling::Result<Self> {
+        let mut options = FieldOptions {
+            ident: field.ident.clone(),
+            ..Self::default()
+        };
+
+        options.stat_type = field.ty.to_token_stream().to_string().contains("Stat");
+
+        for attribute in &field.attrs {
+            if let Some(ident) = attribute.path().get_ident() {
+                match ident.to_string().as_str() {
+                    // Todo Warn about double tags.
+                    "stat" => options.include = true,
+                    "stat_ignore" => options.exclude = true,
+                    _ => continue,
+                }
+            }
+        }
+
+        Ok(options)
+    }
 }
 
 fn struct_fields(s: DataStruct) -> darling::Result<TokenStream> {
     let mut tokens = TokenStream::new();
     for (index, field) in s.fields.iter().enumerate() {
-        let field_state = FieldState::from_field(&field)?;
+        let field_state = FieldOptions::from_field(&field)?;
 
-        let is_stat_type = field_state
-            .ty
-            .to_token_stream()
-            .to_string()
-            .contains("Stat");
-
-        if (field_state.include || is_stat_type) && !field_state.exclude {
+        if (field_state.include || field_state.stat_type) && !field_state.exclude {
             if let Some(ident) = field_state.ident {
                 tokens.extend(quote! {
                     self.#ident.reset_modifiers();
