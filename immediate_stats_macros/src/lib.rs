@@ -1,5 +1,5 @@
-#[cfg(feature = "bevy")]
-mod bevy;
+#[cfg(feature = "bevy_butler")]
+mod bevy_butler;
 
 use proc_macro_error::{
     emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
@@ -22,7 +22,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         Data::Struct(s) => stat_container_struct(s),
         Data::Enum(e) => stat_container_enum(e),
         Data::Union(_) => {
-            emit_call_site_error!("This trait cannot be derived for unions.");
+            emit_call_site_error!("This trait cannot be derived from unions.");
             return proc_macro::TokenStream::new();
         }
     };
@@ -35,7 +35,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
 
     #[cfg(feature = "bevy_butler")]
     {
-        let systems = bevy::butler::register_systems(tree);
+        let systems = bevy_butler::register_systems(tree);
 
         match systems {
             Ok(systems) => quote! { #result #systems }.into(),

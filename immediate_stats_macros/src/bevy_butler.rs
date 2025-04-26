@@ -4,7 +4,8 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{ToTokens, format_ident, quote};
 use syn::{DeriveInput, Expr, Meta, Path};
 
-// Todo Fix error handling and add documentation.
+// Todo Add documentation.
+
 pub fn register_systems(input: DeriveInput) -> darling::Result<TokenStream> {
     let struct_name = &input.ident;
 
