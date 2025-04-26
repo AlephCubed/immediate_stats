@@ -1,28 +1,26 @@
 use darling::ast::NestedMeta;
 use darling::{Error, FromMeta};
-use proc_macro::{self, TokenStream};
-use proc_macro2::Ident;
+use proc_macro2::{Ident, TokenStream};
 use quote::{ToTokens, format_ident, quote};
-use syn::{DeriveInput, Expr, Meta, Path, parse_macro_input};
+use syn::{DeriveInput, Expr, Meta, Path};
 
 // Todo Fix error handling and add documentation.
-pub fn register_systems(input: TokenStream) -> TokenStream {
-    let input = parse_macro_input!(input as DeriveInput);
+pub fn register_systems(input: DeriveInput) -> darling::Result<TokenStream> {
     let struct_name = &input.ident;
 
     let mut butler_attributes = ButlerAttributes::new(struct_name);
 
     for attr in input.attrs {
         if attr.path().is_ident("add_component") {
-            let plugin = PluginPath::from_meta(&attr.meta).unwrap();
+            let plugin = PluginPath::from_meta(&attr.meta)?;
             butler_attributes.component_plugin = Some(plugin);
         } else if attr.path().is_ident("add_resource") {
-            let plugin = PluginPath::from_meta(&attr.meta).unwrap();
+            let plugin = PluginPath::from_meta(&attr.meta)?;
             butler_attributes.resource_plugin = Some(plugin);
         }
     }
 
-    butler_attributes.into_token_stream().into()
+    Ok(butler_attributes.into_token_stream())
 }
 
 pub struct ButlerAttributes<'a> {
@@ -42,7 +40,7 @@ impl<'a> ButlerAttributes<'a> {
 }
 
 impl<'a> ToTokens for ButlerAttributes<'a> {
-    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
         if let Some(plugin_path) = &self.component_plugin {
             let ident = &self.ident;
             let plugin = &plugin_path.0;
