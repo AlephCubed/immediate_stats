@@ -24,7 +24,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         }
     };
 
-    let method = quote! {
+    let trait_impl = quote! {
         impl StatContainer for #ident {
             fn reset_modifiers(&mut self) {
                 #method_contents
@@ -35,11 +35,11 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
     #[cfg(feature = "bevy_butler")]
     {
         let systems = bevy_butler::register_systems(tree).unwrap_or_else(Error::write_errors);
-        quote! { #method #systems }.into()
+        quote! { #trait_impl #systems }.into()
     }
 
     #[cfg(not(feature = "bevy_butler"))]
-    method.into()
+    trait_impl.into()
 }
 
 /// Represents the options that a field could have.
