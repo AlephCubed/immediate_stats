@@ -8,9 +8,9 @@ Includes a derive macro which propagates stat resets to any stat fields.
 struct Speed(Stat);
 
 fn main() {
+    let mut speed = Speed(Stat::new(10)); // Set base speed to 10.
+
     loop {
-        let mut speed = Speed(Stat::new(10)); // Set base speed to 10.
-        
         speed.0 *= 2.0; // Applies a multiplier to the final result.
         speed.0 += 5; // Adds a bonus to the final result.
         // The order does not matter. Bonuses are always applied before multipliers.

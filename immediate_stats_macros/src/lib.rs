@@ -3,7 +3,6 @@ mod bevy_butler;
 mod derive_enum;
 mod derive_struct;
 
-use darling::Error;
 use proc_macro_error::{emit_call_site_error, emit_warning, proc_macro_error};
 use quote::{ToTokens, quote};
 use syn::spanned::Spanned;
@@ -34,7 +33,8 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
 
     #[cfg(feature = "bevy_butler")]
     {
-        let systems = bevy_butler::register_systems(tree).unwrap_or_else(Error::write_errors);
+        let systems =
+            bevy_butler::register_systems(tree).unwrap_or_else(darling::Error::write_errors);
         quote! { #trait_impl #systems }.into()
     }
 
