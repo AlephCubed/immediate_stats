@@ -1,208 +1,92 @@
-#[cfg(feature = "bevy")]
-mod bevy;
+#[cfg(feature = "bevy_butler")]
+mod bevy_butler;
+mod derive_enum;
+mod derive_struct;
 
-use proc_macro_error::{
-    emit_call_site_error, emit_call_site_warning, emit_warning, proc_macro_error,
-};
-use proc_macro2::{Span, TokenStream};
+use darling::Error;
+use proc_macro_error::{emit_call_site_error, emit_warning, proc_macro_error};
 use quote::{ToTokens, quote};
-use syn::{Data, DataEnum, DataStruct, DeriveInput, Field, Ident, Index};
+use syn::spanned::Spanned;
+use syn::{Data, DeriveInput, Field, Ident, parse_macro_input};
 
 #[proc_macro_derive(StatContainer, attributes(stat, stat_ignore, add_component))]
 #[proc_macro_error]
 pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let tree: DeriveInput = syn::parse(item).expect("TokenStream must be valid.");
+    let tree: DeriveInput = parse_macro_input!(item as DeriveInput);
+    let ident = &tree.ident;
 
-    let struct_name = &tree.ident;
-
-    let method = match tree.data.clone() {
-        Data::Struct(s) => stat_container_struct(s),
-        Data::Enum(e) => stat_container_enum(e),
+    let method_contents = match tree.data.clone() {
+        Data::Struct(s) => derive_struct::reset_struct(&s),
+        Data::Enum(e) => derive_enum::reset_enum(&e),
         Data::Union(_) => {
-            emit_call_site_error!("This trait cannot be derived for unions.");
+            emit_call_site_error!("This trait cannot be derived from unions.");
             return proc_macro::TokenStream::new();
         }
     };
 
-    let result = quote! {
-        impl StatContainer for #struct_name {
-            #method
+    let method = quote! {
+        impl StatContainer for #ident {
+            fn reset_modifiers(&mut self) {
+                #method_contents
+            }
         }
     };
 
     #[cfg(feature = "bevy_butler")]
     {
-        let systems = bevy::butler::register_butler_systems(&tree);
-        quote! { #result #systems }.into()
+        let systems = bevy_butler::register_systems(tree).unwrap_or_else(Error::write_errors);
+        quote! { #method #systems }.into()
     }
 
     #[cfg(not(feature = "bevy_butler"))]
-    result.into()
+    method.into()
 }
 
-fn stat_container_struct(s: DataStruct) -> TokenStream {
-    match get_members_from_fields(s.fields) {
-        MemberVec::Named(names) => {
-            quote! {
-                fn reset_modifiers(&mut self) {
-                    #(self.#names.reset_modifiers();)*
-                }
-            }
-        }
-        MemberVec::Unnamed(nums) => {
-            quote! {
-                fn reset_modifiers(&mut self) {
-                    #(self.#nums.reset_modifiers();)*
-                }
-            }
-        }
-        MemberVec::None => {
-            emit_call_site_warning!(
-                "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
+/// Represents the options that a field could have.
+#[derive(Default)]
+struct FieldOptions {
+    ident: Option<Ident>,
+    /// True if the field's type contains the word "Stat".
+    stat_type: bool,
+    /// True if the field has the `#[stat]` attribute.
+    include: bool,
+    /// True if the field has the `#[stat_ignore]` attribute.
+    exclude: bool,
+}
+
+impl FieldOptions {
+    /// Returns true if the field is considered a stat.
+    /// Emits a warning if both the `stat` and `stat_ignore` flags are present.
+    pub fn is_stat(&self) -> bool {
+        if self.include && self.exclude {
+            emit_warning!(
+                self.ident.span(),
+                "`stat` attribute is overruled by `stat_ignore` attribute."
             );
-            TokenStream::new()
         }
+
+        (self.include || self.stat_type) && !self.exclude
     }
-}
 
-fn stat_container_enum(e: DataEnum) -> TokenStream {
-    let mut cases = Vec::new();
+    fn from_field(field: &Field) -> Self {
+        let mut options = FieldOptions {
+            ident: field.ident.clone(),
+            ..Self::default()
+        };
 
-    for variant in e.variants {
-        let ident = variant.ident;
+        options.stat_type = field.ty.to_token_stream().to_string().contains("Stat");
 
-        match get_members_from_fields(variant.fields.clone()) {
-            MemberVec::Named(names) => {
-                cases.push(quote! {
-                    Self::#ident { #(#names,)* .. } => {
-                        #(#names.reset_modifiers();)*
-                    },
-                });
-            }
-            MemberVec::Unnamed(nums) => {
-                let mut variables = Vec::new();
-
-                for index in 0..variant.fields.len() {
-                    if nums.contains(&Index::from(index)) {
-                        variables.push(Ident::new(
-                            format!("{}", ('a' as u8 + index as u8) as char).as_str(),
-                            Span::call_site(),
-                        ))
-                    } else {
-                        variables.push(Ident::new("_", Span::call_site()));
-                    }
+        for attribute in &field.attrs {
+            if let Some(ident) = attribute.path().get_ident() {
+                match ident.to_string().as_str() {
+                    // Todo Warn about double tags.
+                    "stat" => options.include = true,
+                    "stat_ignore" => options.exclude = true,
+                    _ => continue,
                 }
-
-                if variables.is_empty() {
-                    continue;
-                }
-
-                let used_vars = variables.iter().filter(|x| x.to_string() != "_");
-
-                cases.push(quote! {
-                    Self::#ident(#(#variables,)*) => {
-                        #(#used_vars.reset_modifiers();)*
-                    },
-                });
-            }
-            MemberVec::None => {}
-        }
-    }
-
-    if cases.is_empty() {
-        emit_call_site_warning!(
-            "Unused derive. Consider adding `#[stat]` to a field that implements `StatContainer`."
-        );
-    }
-
-    quote! {
-        fn reset_modifiers(&mut self) {
-            match self {
-                #(#cases)*
-                _ => {},
             }
         }
-    }
-}
 
-/// The ways to identify fields.
-enum MemberVec {
-    Named(Vec<Ident>),
-    Unnamed(Vec<Index>),
-    None,
-}
-
-/// Returns a list of all fields that either have type `Stat` or are tagged with `#[stat]`.
-/// If they are tagged with `#[stat_ignore]`, they are removed from the list.
-fn get_members_from_fields<T: IntoIterator<Item = Field>>(fields: T) -> MemberVec {
-    let mut names = Vec::new();
-    let mut nums = Vec::new();
-
-    for (index, field) in fields.into_iter().enumerate() {
-        // Check if the field is a stat.
-        let mut is_stat = false;
-
-        // Check if type is `Stat`.
-        if field.ty.to_token_stream().to_string().contains("Stat") {
-            is_stat = true;
-        }
-
-        // Store the `#[stat]` ident. Used for warning when overridden by `#[stat_ignore]`.
-        let mut explicit_stat: Option<Ident> = None;
-
-        // Iterator over all ident attributes.
-        let attr_ident_iter = field.attrs.iter().filter_map(|x| x.meta.path().get_ident());
-
-        // Check for `#[stat]` attribute.
-        if let Some(attr_ident) = attr_ident_iter.clone().find(|x| x.to_string() == "stat") {
-            if is_stat {
-                emit_warning!(
-                    attr_ident,
-                    "Unnecessary `stat` attribute. Fields of type `Stat` are automatically included."
-                );
-            }
-
-            is_stat = true;
-            explicit_stat = Some(attr_ident.clone());
-        }
-
-        // Check for `#[stat_ignore]` attribute.
-        if attr_ident_iter
-            .clone()
-            .find(|x| x.to_string() == "stat_ignore")
-            .is_some()
-        {
-            if let Some(explicit_ident) = &explicit_stat {
-                emit_warning!(
-                    explicit_ident,
-                    "`stat` attribute is overruled by `stat_ignore` attribute."
-                );
-            }
-
-            is_stat = false;
-        }
-
-        if !is_stat {
-            continue;
-        }
-
-        // Add field to the list.
-        if let Some(field_ident) = field.ident.clone() {
-            // (health_base, damage_base, etc.)
-            names.push(field_ident);
-        } else {
-            // Is tuple.
-            nums.push(Index::from(index));
-        }
-    }
-
-    assert!(names.is_empty() | nums.is_empty());
-
-    if names.is_empty() {
-        MemberVec::Unnamed(nums)
-    } else if nums.is_empty() {
-        MemberVec::Named(names)
-    } else {
-        MemberVec::None
+        options
     }
 }
