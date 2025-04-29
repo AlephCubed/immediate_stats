@@ -49,12 +49,15 @@ This automatically registers the required system(s) using the `add_component` at
 #[butler_plugin]
 struct MyPlugin;
 
-#[derive(StatContainer, Component)]
-#[add_component(plugin = MyPlugin)] // Added by `StatContainer` derive.
+// `StatContainer` derive adds the `add_component` attribute 
+// and hooks into the existing `add_resource` macro.
+#[derive(StatContainer, Component, Resource)]
+#[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+#[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 struct Speed(Stat);
 ```
 
 ### Version Compatibility
-| bevy   | immediate_stats |
+| Bevy   | Immediate Stats |
 |--------|-----------------|
 | `0.16` | `0.1`           |

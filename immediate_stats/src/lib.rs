@@ -33,7 +33,7 @@
 //! # use bevy_app::prelude::*;
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
-//! #[derive(StatContainer, Component, Resource)]
+//! #[derive(StatContainer, Component, Resource, Default)]
 //! struct Speed(Stat);
 //!
 //! fn main() {
@@ -54,21 +54,23 @@
 //!
 #![cfg_attr(not(feature = "bevy_butler"), doc = "```rust ignore")]
 #![cfg_attr(feature = "bevy_butler", doc = "```rust")]
-//! use bevy_app::prelude::*;
-//! use bevy_ecs::prelude::*;
-//! use immediate_stats::*;
-//! use bevy_butler::*;
-//!
+//! # use bevy_app::prelude::*;
+//! # use bevy_ecs::prelude::*;
+//! # use immediate_stats::*;
+//! # use bevy_butler::*;
 //! #[butler_plugin]
 //! struct MyPlugin;
 //!
-//! #[derive(StatContainer, Component)]
-//! #[add_component(plugin = MyPlugin)] // Added by `StatContainer` derive.
+//! // `StatContainer` derive adds the `add_component` attribute
+//! // and hooks into the existing `add_resource` macro.
+//! #[derive(StatContainer, Component, Resource, Default)]
+//! #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+//! #[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 //! struct Speed(Stat);
 //! ```
 //!
 //! ### Version Compatibility
-//! | bevy   | immediate_stats |
+//! | Bevy   | Immediate Stats |
 //! |--------|-----------------|
 //! | `0.16` | `0.1`           |
 
@@ -142,8 +144,11 @@ pub mod stat;
 /// #[butler_plugin]
 /// struct MyPlugin;
 ///
-/// #[derive(Component, StatContainer)]
-/// #[add_component(plugin = MyPlugin)]
+/// // `StatContainer` derive adds the `add_component` attribute
+/// // and hooks into the existing `add_resource` macro.
+/// #[derive(StatContainer, Component, Resource, Default)]
+/// #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+/// #[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 /// struct Speed(Stat);
 /// ```
 pub use immediate_stats_macros::StatContainer;
