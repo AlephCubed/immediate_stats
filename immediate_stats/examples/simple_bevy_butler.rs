@@ -5,16 +5,16 @@ use bevy::prelude::*;
 use bevy_butler::*;
 use immediate_stats::*;
 
+fn main() {
+    App::new().add_plugins((MinimalPlugins, SpeedPlugin)).run();
+}
+
 #[butler_plugin]
 struct SpeedPlugin;
 
 #[derive(StatContainer, Component)]
 #[add_component(plugin = SpeedPlugin)]
 struct Speed(Stat);
-
-fn main() {
-    App::new().add_plugins((MinimalPlugins, SpeedPlugin)).run();
-}
 
 #[add_system(plugin = SpeedPlugin, schedule = Startup)]
 fn init_speed(mut commands: Commands) {

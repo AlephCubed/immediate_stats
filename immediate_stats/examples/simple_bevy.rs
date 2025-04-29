@@ -4,18 +4,23 @@
 use bevy::prelude::*;
 use immediate_stats::*;
 
+fn main() {
+    App::new().add_plugins((MinimalPlugins, SpeedPlugin)).run();
+}
+
+struct SpeedPlugin;
+
+impl Plugin for SpeedPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(Startup, init_speed)
+            .add_systems(PreUpdate, reset_component_modifiers::<Speed>)
+            // Modifiers must be applied before the speed can be read.
+            .add_systems(Update, (apply_modifiers, read_speed).chain());
+    }
+}
+
 #[derive(StatContainer, Component)]
 struct Speed(Stat);
-
-fn main() {
-    App::new()
-        .add_plugins(MinimalPlugins)
-        .add_systems(Startup, init_speed)
-        .add_systems(PreUpdate, reset_component_modifiers::<Speed>)
-        // Modifiers must be applied before the speed can be read.
-        .add_systems(Update, (apply_modifiers, read_speed).chain())
-        .run();
-}
 
 fn init_speed(mut commands: Commands) {
     commands.spawn(Speed(Stat::new(10))); // Set base speed to 10.
