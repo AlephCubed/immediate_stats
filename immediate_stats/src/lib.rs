@@ -75,9 +75,9 @@
 //! | `0.16` | `0.1`           |
 
 #[cfg(feature = "bevy")]
-pub mod bevy;
-pub mod modifier;
-pub mod stat;
+mod bevy;
+mod modifier;
+mod stat;
 
 /// Implements [`reset_modifiers`](StatContainer::reset_modifiers)
 /// by propagating the call down to any `StatContainer` fields.

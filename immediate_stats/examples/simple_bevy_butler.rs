@@ -2,8 +2,8 @@
 //! There are two other versions of this example, one using a simple main loop and the other using Bevy.
 
 use bevy::prelude::*;
-use bevy_butler::{add_system, butler_plugin};
-use immediate_stats::{Stat, StatContainer};
+use bevy_butler::*;
+use immediate_stats::*;
 
 #[butler_plugin]
 struct SpeedPlugin;

@@ -2,7 +2,7 @@
 //! There are two other versions of this example, one using a simple main loop and the other using Bevy Butler.
 
 use bevy::prelude::*;
-use immediate_stats::{Stat, StatContainer, reset_component_modifiers};
+use immediate_stats::*;
 
 #[derive(StatContainer, Component)]
 struct Speed(Stat);

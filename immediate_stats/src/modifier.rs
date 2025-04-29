@@ -2,7 +2,7 @@
 
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
-/// Modifier values that can be applied to a [`super::Stat`].
+/// Modifier values that can be [applied](super::Stat::apply) to a [`Stat`](super::Stat).
 #[derive(PartialEq, Debug, Copy, Clone)]
 #[cfg_attr(
     feature = "bevy",
