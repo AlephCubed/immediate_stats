@@ -16,12 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
     - name: Test
       run: cargo test --verbose
-    - name: Build with features
-      run: cargo build --all-features --verbose
     - name: Test with features
       run: cargo test --all-features --verbose
     - name: Check format

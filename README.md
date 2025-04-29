@@ -8,9 +8,9 @@ Includes a derive macro which propagates stat resets to any stat fields.
 struct Speed(Stat);
 
 fn main() {
+    let mut speed = Speed(Stat::new(10)); // Set base speed to 10.
+
     loop {
-        let mut speed = Speed(Stat::new(10)); // Set base speed to 10.
-        
         speed.0 *= 2.0; // Applies a multiplier to the final result.
         speed.0 += 5; // Adds a bonus to the final result.
         // The order does not matter. Bonuses are always applied before multipliers.
@@ -49,12 +49,15 @@ This automatically registers the required system(s) using the `add_component` at
 #[butler_plugin]
 struct MyPlugin;
 
-#[derive(StatContainer, Component)]
-#[add_component(plugin = MyPlugin)] // Added by `StatContainer` derive.
+// `StatContainer` derive adds the `add_component` attribute 
+// and hooks into the existing `add_resource` macro.
+#[derive(StatContainer, Component, Resource)]
+#[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+#[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 struct Speed(Stat);
 ```
 
 ### Version Compatibility
-| bevy   | immediate_stats |
+| Bevy   | Immediate Stats |
 |--------|-----------------|
 | `0.16` | `0.1`           |

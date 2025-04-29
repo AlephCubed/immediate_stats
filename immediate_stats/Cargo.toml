@@ -24,9 +24,26 @@ bevy_ecs = { version = "0.16.0", default-features = false, optional = true, feat
 bevy_reflect = { version = "0.16.0", default-features = false, optional = true }
 immediate_stats_macros = { path = "../immediate_stats_macros", default-features = false }
 
+[dev-dependencies]
+bevy = { version = "0.16.0", default-features = false }
+
 [lints.rust]
 missing_docs = "warn"
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(docsrs_dep)'] }
 unsafe_code = "deny"
 unsafe_op_in_unsafe_fn = "warn"
 unused_qualifications = "warn"
+
+[[example]]
+name = "simple_main_loop"
+path = "examples/simple_main_loop.rs"
+
+[[example]]
+name = "simple_bevy"
+path = "examples/simple_bevy.rs"
+required-features = ["bevy"]
+
+[[example]]
+name = "simple_bevy_butler"
+path = "examples/simple_bevy_butler.rs"
+required-features = ["bevy_butler"]

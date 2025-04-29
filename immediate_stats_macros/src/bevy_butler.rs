@@ -4,8 +4,7 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{ToTokens, format_ident, quote};
 use syn::{DeriveInput, Expr, Meta, Path};
 
-// Todo Add documentation.
-
+/// Returns code that will register stat resetting system(s) with Bevy Butler.
 pub fn register_systems(input: DeriveInput) -> darling::Result<TokenStream> {
     let struct_name = &input.ident;
 
@@ -49,7 +48,7 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
 
             tokens.extend(quote! {
                 #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
-                use immediate_stats::bevy::reset_component_modifiers as #use_as;
+                use immediate_stats::reset_component_modifiers as #use_as;
             });
         }
 
@@ -60,7 +59,7 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
 
             tokens.extend(quote! {
                 #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
-                use immediate_stats::bevy::reset_resource_modifiers as #use_as;
+                use immediate_stats::reset_resource_modifiers as #use_as;
             });
         }
     }
