@@ -22,7 +22,7 @@ impl Plugin for ImmediateStatsPlugin {
     }
 }
 
-/// Prevents a [`StatContainers`](StatContainer) from resetting.
+/// Prevents any [`StatContainers`](StatContainer) on an entity from resetting.
 #[derive(Component, Reflect, Eq, PartialEq, Debug, Default, Clone)]
 #[component(storage = "SparseSet")]
 #[reflect(Component, PartialEq, Debug, Default, Clone)]

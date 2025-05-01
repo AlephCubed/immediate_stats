@@ -10,9 +10,13 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
     reflect(PartialEq, Debug, Clone)
 )]
 pub struct Modifier {
-    /// Added to `base` of a [`super::Stat`] during calculation.
+    /// Added to `base` of a [`Stat`](super::Stat) during calculation.
+    ///
+    /// Can be modified using [`+=`](Modifier::add_assign) and [`-=`](`Modifier::sub_assign`).
     pub bonus: i32,
-    /// Multiplies the `base` of a [`super::Stat`] during calculation.
+    /// Multiplies the `base` of a [`Stat`](super::Stat) during calculation.
+    ///
+    /// Can be modified using [`*=`](`Modifier::mul_assign`) and [`/=`](`Modifier::div_assign`).
     pub multiplier: f32,
 }
 
@@ -49,24 +53,28 @@ impl Default for Modifier {
 }
 
 impl AddAssign<i32> for Modifier {
+    /// Adds to the modifier's bonus.
     fn add_assign(&mut self, rhs: i32) {
         self.bonus += rhs;
     }
 }
 
 impl SubAssign<i32> for Modifier {
+    /// Subtracts from the modifier's bonus.
     fn sub_assign(&mut self, rhs: i32) {
         self.bonus -= rhs;
     }
 }
 
 impl MulAssign<f32> for Modifier {
+    /// Multiplies the modifier's multiplier.
     fn mul_assign(&mut self, rhs: f32) {
         self.multiplier *= rhs;
     }
 }
 
 impl DivAssign<f32> for Modifier {
+    /// Divides the modifier's multiplier.
     fn div_assign(&mut self, rhs: f32) {
         self.multiplier /= rhs;
     }

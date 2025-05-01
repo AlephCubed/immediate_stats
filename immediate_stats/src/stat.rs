@@ -24,16 +24,17 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 )]
 pub struct Stat {
     /// The persistent value of the stat.
+    /// After being [reset](StatContainer::reset_modifiers), [`Stat::total`] will be equal to `base`.
     pub base: i32,
     /// Added to `base` during calculation and gets reset to zero every iteration.
     /// This is added *before* `multiplier` is applied.
     ///
-    /// Can be modified using [`Stat::add_assign`] and [`Stat::sub_assign`]
+    /// Can be modified using [`+=`](Stat::add_assign) or [`-=`](Stat::sub_assign).
     pub bonus: i32,
     /// Multiplies the `base` during calculation and gets reset to one every iteration.
     /// This is applied *after* `bonus` is added.
     ///
-    /// Can be modified using [`Stat::mul_assign`] and [`Stat::div_assign`]
+    /// Can be modified using [*=](`Stat::mul_assign`) or [/=](`Stat::div_assign`).
     pub multiplier: f32,
 }
 
@@ -97,24 +98,28 @@ impl Default for Stat {
 }
 
 impl AddAssign<i32> for Stat {
+    /// Adds to the stat's bonus.
     fn add_assign(&mut self, rhs: i32) {
         self.bonus += rhs;
     }
 }
 
 impl SubAssign<i32> for Stat {
+    /// Subtracts from the stat's bonus.
     fn sub_assign(&mut self, rhs: i32) {
         self.bonus -= rhs;
     }
 }
 
 impl MulAssign<f32> for Stat {
+    /// Multiplies the stat's multiplier.
     fn mul_assign(&mut self, rhs: f32) {
         self.multiplier *= rhs;
     }
 }
 
 impl DivAssign<f32> for Stat {
+    /// Divides the stat's multiplier.
     fn div_assign(&mut self, rhs: f32) {
         self.multiplier /= rhs;
     }
