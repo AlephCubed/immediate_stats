@@ -1,7 +1,10 @@
 # Immediate Stats
 
-Game stats that reset every frame. Inspired by immediate mode rendering.
-Includes a derive macro which propagates stat resets to any stat fields.
+Game stats that reset every frame, inspired by immediate mode rendering.
+
+This makes it easy to implement temporary buffs/debuffs, and effects that change over time.
+Using a derive macro, stat resets are propagated to any stat fields, 
+making it easy to compose stats into more complex or specific objects.
 
 ```rust
 #[derive(StatContainer)]
