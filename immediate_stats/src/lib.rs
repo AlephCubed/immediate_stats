@@ -39,9 +39,9 @@
 //!
 //! fn main() {
 //!     App::new()
-//!         .add_systems(PreUpdate, (
-//!             reset_component_modifiers::<Speed>,
-//!             reset_resource_modifiers::<Speed>,
+//!         .add_plugins((
+//!             ResetComponentPlugin::<Speed>::new(),
+//!             ResetResourcePlugin::<Speed>::new(),
 //!         ))
 //!         .run();
 //! }
@@ -52,7 +52,7 @@
 //! If you use [Bevy Butler](https://github.com/TGRCdev/bevy-butler/),
 //! you can also use the `bevy_butler` feature flag.
 //! This automatically registers the required system(s) using the `add_component` attribute
-//! or the existing `add_resource` macro.
+//! or the existing `insert_resource` macro.
 //!
 #![cfg_attr(not(feature = "bevy_butler"), doc = "```rust ignore")]
 #![cfg_attr(feature = "bevy_butler", doc = "```rust")]
@@ -64,10 +64,10 @@
 //! struct MyPlugin;
 //!
 //! // `StatContainer` derive adds the `add_component` attribute
-//! // and hooks into the existing `add_resource` macro.
+//! // and hooks into the existing `insert_resource` macro.
 //! #[derive(StatContainer, Component, Resource, Default)]
 //! #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-//! #[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+//! #[insert_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 //! struct Speed(Stat);
 //! ```
 //!
@@ -138,7 +138,7 @@ mod stat;
 /// ```
 /// # Bevy Butler
 /// If the `bevy_butler` feature flag is enabled, you may also use the `add_component` attribute
-/// or the existing `add_resource` macro to register [`reset_component_modifiers`]
+/// or the existing `insert_resource` macro to register [`reset_component_modifiers`]
 /// and/or [`reset_resource_modifiers`] automatically.
 #[cfg_attr(not(feature = "bevy_butler"), doc = "```rust ignore")]
 #[cfg_attr(feature = "bevy_butler", doc = "```rust")]
@@ -149,10 +149,10 @@ mod stat;
 /// struct MyPlugin;
 ///
 /// // `StatContainer` derive adds the `add_component` attribute
-/// // and hooks into the existing `add_resource` macro.
+/// // and hooks into the existing `insert_resource` macro.
 /// #[derive(StatContainer, Component, Resource, Default)]
 /// #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-/// #[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+/// #[insert_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 /// struct Speed(Stat);
 /// ```
 pub use immediate_stats_macros::StatContainer;
@@ -165,9 +165,7 @@ pub use bevy::*;
 // Used by derive macro.
 #[cfg(feature = "bevy")]
 #[doc(hidden)]
-pub mod __internal {
-    pub use bevy_app::prelude::PreUpdate;
-}
+pub use bevy_app::prelude::PreUpdate as __PreUpdate;
 
 /// Types that contain stats that need to be reset.
 ///

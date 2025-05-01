@@ -35,9 +35,9 @@ struct Speed(Stat);
 
 fn main() {
     App::new()
-        .add_systems(PreUpdate, (
-            reset_component_modifiers::<Speed>,
-            reset_resource_modifiers::<Speed>,
+        .add_plugins((
+            ResetComponentPlugin::<Speed>::new(),
+            ResetResourcePlugin::<Speed>::new(),
         ))
         .run();
 }
@@ -46,17 +46,18 @@ fn main() {
 ### Bevy Butler
 
 If you use [Bevy Butler](https://github.com/TGRCdev/bevy-butler/), you can also use the `bevy_butler` feature flag.
-This automatically registers the required system(s) using the `add_component` attribute.
+This automatically registers the required system(s) using the `add_component` attribute
+or the existing `insert_resource` macro.
 
 ```rust
 #[butler_plugin]
 struct MyPlugin;
 
 // `StatContainer` derive adds the `add_component` attribute 
-// and hooks into the existing `add_resource` macro.
+// and hooks into the existing `insert_resource` macro.
 #[derive(StatContainer, Component, Resource)]
 #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-#[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+#[insert_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 struct Speed(Stat);
 ```
 

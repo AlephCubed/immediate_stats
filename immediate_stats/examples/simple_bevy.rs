@@ -12,12 +12,8 @@ struct SpeedPlugin;
 
 impl Plugin for SpeedPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(ImmediateStatsPlugin)
+        app.add_plugins((ImmediateStatsPlugin, ResetComponentPlugin::<Speed>::new()))
             .add_systems(Startup, init_speed)
-            .add_systems(
-                PreUpdate,
-                reset_component_modifiers::<Speed>.in_set(StatSystems::Reset),
-            )
             .add_systems(
                 Update,
                 (
