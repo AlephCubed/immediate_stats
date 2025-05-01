@@ -11,7 +11,7 @@ impl StatContainer for MyStat {
 
 #[derive(StatContainer, PartialEq, Debug)]
 struct Movement {
-    speed: Stat,
+    speed: iStat,
     custom: MyStat,
     other: bool,
 }
@@ -43,7 +43,7 @@ fn reset() {
 }
 
 #[derive(StatContainer, PartialEq, Debug)]
-struct MaxHealth(Stat, bool);
+struct MaxHealth(iStat, bool);
 
 #[test]
 fn reset_tuple_struct() {
@@ -94,16 +94,16 @@ fn reset_with_attribute() {
 #[derive(StatContainer, PartialEq, Debug)]
 struct PartialReset {
     #[stat_ignore]
-    ignored: Stat,
-    reset: Stat,
+    ignored: fStat,
+    reset: fStat,
 }
 
 #[test]
 fn reset_ignored() {
     for base in 0..10 {
         let stat = Stat {
-            base,
-            bonus: 3,
+            base: base as f32,
+            bonus: 3.0,
             multiplier: 1.5,
         };
 
@@ -115,17 +115,17 @@ fn reset_ignored() {
         partial.reset_modifiers();
 
         assert_eq!(partial.ignored, stat);
-        assert_eq!(partial.reset, Stat::new(base));
+        assert_eq!(partial.reset, Stat::new(base as f32));
     }
 }
 
 #[derive(StatContainer, PartialEq, Debug)]
 enum EnumStat {
     Named {
-        stat: Stat,
+        stat: iStat,
         other: u8,
     },
-    Unnamed(Stat, u8),
+    Unnamed(iStat, u8),
     #[expect(dead_code)]
     Other,
 }

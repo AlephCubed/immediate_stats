@@ -20,7 +20,7 @@ impl Plugin for SpeedPlugin {
 }
 
 #[derive(StatContainer, Component)]
-struct Speed(Stat);
+struct Speed(iStat);
 
 fn init_speed(mut commands: Commands) {
     commands.spawn(Speed(Stat::new(10))); // Set base speed to 10.

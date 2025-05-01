@@ -1,8 +1,20 @@
 //! Contains the basic stat object.
 
+pub mod modifier;
+
 use crate::StatContainer;
-use crate::modifier::Modifier;
+use modifier::Modifier;
+use num::Num;
+use std::fmt::Debug;
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
+
+/// Trait bounds for [`Stat`] and [`Modifier`] numbers.
+pub trait StatNum:
+    Num + AddAssign + SubAssign + MulAssign + DivAssign + Debug + Clone + Copy
+{
+}
+
+impl<T: Num + AddAssign + SubAssign + MulAssign + DivAssign + Debug + Clone + Copy> StatNum for T {}
 
 /// A stat that [resets][reset] to a base value every iteration.
 ///
@@ -22,50 +34,45 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
     derive(bevy_reflect::Reflect),
     reflect(PartialEq, Debug, Clone)
 )]
-pub struct Stat {
+pub struct Stat<B: StatNum, M: StatNum> {
     /// The persistent value of the stat.
     /// After being [reset](StatContainer::reset_modifiers), [`Stat::total`] will be equal to `base`.
-    pub base: i32,
+    pub base: B,
     /// Added to `base` during calculation and gets reset to zero every iteration.
     /// This is added *before* `multiplier` is applied.
     ///
     /// Can be modified using [`+=`](Stat::add_assign) or [`-=`](Stat::sub_assign).
-    pub bonus: i32,
+    pub bonus: B,
     /// Multiplies the `base` during calculation and gets reset to one every iteration.
     /// This is applied *after* `bonus` is added.
     ///
     /// Can be modified using [*=](`Stat::mul_assign`) or [/=](`Stat::div_assign`).
-    pub multiplier: f32,
+    pub multiplier: M,
 }
 
-impl Stat {
+impl<B: StatNum, M: StatNum> Stat<B, M> {
     /// Creates a new modifier from a base value.
-    pub fn new(base: i32) -> Self {
+    pub fn new(base: B) -> Self {
         Self {
             base,
             ..Default::default()
         }
     }
 
-    /// Calculates the total value of the stat.
-    pub fn total(&self) -> i32 {
-        ((self.base + self.bonus) as f32 * self.multiplier) as i32
-    }
-
     /// A builder that overwrites the current bonus with a new value.
-    pub fn with_bonus(mut self, bonus: i32) -> Self {
+    pub fn with_bonus(mut self, bonus: B) -> Self {
         self.bonus = bonus;
         self
     }
 
     /// A builder that overwrites the multiplier bonus with a new value.
-    pub fn with_multiplier(mut self, multiplier: f32) -> Self {
+    pub fn with_multiplier(mut self, multiplier: M) -> Self {
         self.multiplier = multiplier;
         self
     }
 
     /// A builder that overwrites the current bonus and multiplier with a new value.
-    pub fn with_modifier(mut self, modifier: Modifier) -> Self {
+    pub fn with_modifier(mut self, modifier: Modifier<B, M>) -> Self {
         self.bonus = modifier.bonus;
         self.multiplier = modifier.multiplier;
         self
@@ -74,53 +81,79 @@ impl Stat {
     /// Applies the [`Modifier`] values to the bonus and multiplier.
     ///
     /// This adds the bonuses, and multiplies the multipliers.
-    pub fn apply(&mut self, modifier: Modifier) {
+    pub fn apply(&mut self, modifier: Modifier<B, M>) {
         self.bonus += modifier.bonus;
         self.multiplier *= modifier.multiplier;
     }
 }
 
-impl StatContainer for Stat {
+macro_rules! stat_impl {
+    ($B:ident, $M:ident) => {
+        impl Stat<$B, $M> {
+            /// Calculates the total value of the stat.
+            pub fn total(&self) -> $B {
+                ((self.base + self.bonus) as $M * self.multiplier) as $B
+            }
+        }
+    };
+}
+
+stat_impl!(i32, f32);
+stat_impl!(i64, f64);
+
+stat_impl!(f32, f32);
+stat_impl!(f64, f64);
+
+pub type iStat32 = Stat<i32, f32>;
+pub type iStat64 = Stat<i64, f64>;
+
+pub type fStat32 = Stat<f32, f32>;
+pub type fStat64 = Stat<f64, f64>;
+
+pub type iStat = iStat32;
+pub type fStat = fStat32;
+
+impl<B: StatNum, M: StatNum> StatContainer for Stat<B, M> {
     fn reset_modifiers(&mut self) {
-        self.bonus = 0;
-        self.multiplier = 1.0;
+        self.bonus = B::zero();
+        self.multiplier = M::one();
     }
 }
 
-impl Default for Stat {
+impl<B: StatNum, M: StatNum> Default for Stat<B, M> {
     fn default() -> Self {
         Self {
-            base: 0,
-            bonus: 0,
-            multiplier: 1.0,
+            base: B::zero(),
+            bonus: B::zero(),
+            multiplier: M::one(),
         }
     }
 }
 
-impl AddAssign<i32> for Stat {
+impl<B: StatNum, M: StatNum> AddAssign<B> for Stat<B, M> {
     /// Adds to the stat's bonus.
-    fn add_assign(&mut self, rhs: i32) {
+    fn add_assign(&mut self, rhs: B) {
         self.bonus += rhs;
     }
 }
 
-impl SubAssign<i32> for Stat {
+impl<B: StatNum, M: StatNum> SubAssign<B> for Stat<B, M> {
     /// Subtracts from the stat's bonus.
-    fn sub_assign(&mut self, rhs: i32) {
+    fn sub_assign(&mut self, rhs: B) {
         self.bonus -= rhs;
     }
 }
 
-impl MulAssign<f32> for Stat {
+impl<B: StatNum, M: StatNum> MulAssign<M> for Stat<B, M> {
     /// Multiplies the stat's multiplier.
-    fn mul_assign(&mut self, rhs: f32) {
+    fn mul_assign(&mut self, rhs: M) {
         self.multiplier *= rhs;
     }
 }
 
-impl DivAssign<f32> for Stat {
+impl<B: StatNum, M: StatNum> DivAssign<M> for Stat<B, M> {
     /// Divides the stat's multiplier.
-    fn div_assign(&mut self, rhs: f32) {
+    fn div_assign(&mut self, rhs: M) {
         self.multiplier /= rhs;
     }
 }

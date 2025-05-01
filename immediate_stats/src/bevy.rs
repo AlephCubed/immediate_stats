@@ -1,9 +1,7 @@
 #![cfg(feature = "bevy")]
 //! Contains systems and components for resetting [`StatContainer`]s in the Bevy game engine.
 
-use crate::StatContainer;
-use crate::modifier::Modifier;
-use crate::stat::Stat;
+use crate::*;
 use bevy_app::{App, Plugin};
 use bevy_ecs::component::Mutable;
 use bevy_ecs::prelude::ReflectComponent;
@@ -17,8 +15,14 @@ pub struct ImmediateStatsPlugin;
 impl Plugin for ImmediateStatsPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<PauseStatReset>()
-            .register_type::<Stat>()
-            .register_type::<Modifier>();
+            .register_type::<iStat32>()
+            .register_type::<iStat64>()
+            .register_type::<fStat32>()
+            .register_type::<fStat64>()
+            .register_type::<iModifier32>()
+            .register_type::<iModifier64>()
+            .register_type::<fModifier32>()
+            .register_type::<fModifier64>();
     }
 }
 

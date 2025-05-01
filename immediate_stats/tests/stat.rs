@@ -75,36 +75,39 @@ fn divide() {
 #[test]
 fn default_total() {
     for i in 0..10 {
-        assert_eq!(Stat::new(i).total(), i);
+        assert_eq!(iStat::new(i).total(), i);
     }
 }
 
 #[test]
 fn total() {
     assert_eq!(
-        Stat {
-            base: 10,
-            bonus: 4,
+        fStat {
+            base: 10.0,
+            bonus: 4.0,
             multiplier: 1.5,
         }
         .total(),
-        21
+        21.0
     )
 }
 
 #[test]
 fn total_no_bonus() {
-    assert_eq!(Stat::new(20).with_multiplier(0.5).total(), 10);
+    assert_eq!(iStat::new(20).with_multiplier(0.5).total(), 10);
 }
 
 #[test]
 fn total_no_multiplier() {
-    assert_eq!(Stat::new(2).with_bonus(1).total(), 3);
+    assert_eq!(fStat::new(2.0).with_bonus(1.0).total(), 3.0);
 }
 
 #[test]
 fn total_with_modifier() {
-    assert_eq!(Stat::new(5).with_modifier(Modifier::new(1, 0.5)).total(), 3);
+    assert_eq!(
+        iStat::new(5).with_modifier(Modifier::new(1, 0.5)).total(),
+        3
+    );
 }
 
 #[test]

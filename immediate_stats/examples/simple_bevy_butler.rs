@@ -14,7 +14,7 @@ struct SpeedPlugin;
 
 #[derive(StatContainer, Component)]
 #[add_component(plugin = SpeedPlugin)]
-struct Speed(Stat);
+struct Speed(iStat);
 
 #[add_system(plugin = SpeedPlugin, schedule = Startup)]
 fn init_speed(mut commands: Commands) {

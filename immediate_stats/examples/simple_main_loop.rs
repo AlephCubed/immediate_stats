@@ -4,7 +4,7 @@
 use immediate_stats::*;
 
 #[derive(StatContainer)]
-struct Speed(Stat);
+struct Speed(iStat);
 
 fn main() {
     let mut speed = Speed(Stat::new(10)); // Set base speed to 10.

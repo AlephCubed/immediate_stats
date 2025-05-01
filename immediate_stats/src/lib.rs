@@ -7,7 +7,7 @@
 //! ```rust no_run
 //! # use immediate_stats::*;
 //! #[derive(StatContainer)]
-//! struct Speed(Stat);
+//! struct Speed(iStat);
 //!
 //! fn main() {
 //!     loop {
@@ -35,7 +35,7 @@
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
 //! #[derive(StatContainer, Component, Resource, Default)]
-//! struct Speed(Stat);
+//! struct Speed(iStat);
 //!
 //! fn main() {
 //!     App::new()
@@ -68,7 +68,7 @@
 //! #[derive(StatContainer, Component, Resource, Default)]
 //! #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
 //! #[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
-//! struct Speed(Stat);
+//! struct Speed(iStat);
 //! ```
 //!
 //! ### Version Compatibility
@@ -78,7 +78,6 @@
 
 #[cfg(feature = "bevy")]
 mod bevy;
-mod modifier;
 mod stat;
 
 /// Implements [`reset_modifiers`](StatContainer::reset_modifiers)
@@ -87,7 +86,7 @@ mod stat;
 /// # use immediate_stats::*;
 /// #[derive(StatContainer, Default, Debug, PartialEq)]
 /// struct Health {
-///     max: Stat, // `Health::reset_modifiers` calls will be passed onto `max`.
+///     max: iStat, // `Health::reset_modifiers` calls will be passed onto `max`.
 ///     current: i32,
 /// }
 ///
@@ -110,7 +109,7 @@ mod stat;
 /// # use immediate_stats::*;
 /// # #[derive(StatContainer, Default, Debug, PartialEq)]
 /// # struct Health {
-/// #     max: Stat,
+/// #     max: iStat,
 /// #     current: i32,
 /// # }
 /// #[derive(StatContainer)]
@@ -118,7 +117,7 @@ mod stat;
 ///     #[stat]
 ///     custom: Health, // Will get reset.
 ///     #[stat_ignore]
-///     ignored: Stat, // Will not get reset.
+///     ignored: iStat, // Will not get reset.
 /// }
 ///
 /// fn main () {
@@ -153,10 +152,10 @@ mod stat;
 /// #[derive(StatContainer, Component, Resource, Default)]
 /// #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
 /// #[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
-/// struct Speed(Stat);
+/// struct Speed(iStat);
 /// ```
 pub use immediate_stats_macros::StatContainer;
-pub use modifier::*;
+pub use stat::modifier::*;
 pub use stat::*;
 
 #[cfg(feature = "bevy")]

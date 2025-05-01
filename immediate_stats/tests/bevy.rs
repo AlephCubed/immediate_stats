@@ -5,7 +5,7 @@ use bevy_ecs::prelude::*;
 use immediate_stats::*;
 
 #[derive(Component, Resource, StatContainer, PartialEq, Debug, Clone)]
-struct Health(Stat);
+struct Health(iStat);
 
 #[test]
 fn reset_component() {
