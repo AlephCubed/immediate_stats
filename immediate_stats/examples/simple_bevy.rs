@@ -12,10 +12,20 @@ struct SpeedPlugin;
 
 impl Plugin for SpeedPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, init_speed)
-            .add_systems(PreUpdate, reset_component_modifiers::<Speed>)
-            // Modifiers must be applied before the speed can be read.
-            .add_systems(Update, (apply_modifiers, read_speed).chain());
+        app.add_plugins(ImmediateStatsPlugin)
+            .add_systems(Startup, init_speed)
+            .add_systems(
+                PreUpdate,
+                reset_component_modifiers::<Speed>.in_set(StatSystems::Reset),
+            )
+            .add_systems(
+                Update,
+                (
+                    // Modifiers must be applied before the speed can be read.
+                    apply_modifiers.in_set(StatSystems::Modify),
+                    read_speed.in_set(StatSystems::Read),
+                ),
+            );
     }
 }
 

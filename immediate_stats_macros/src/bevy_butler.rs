@@ -47,7 +47,12 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
             let use_as = format_ident!("__{ident}_component");
 
             tokens.extend(quote! {
-                #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
+                #[bevy_butler::add_system(
+                    generics = <#ident>,
+                    plugin = #plugin,
+                    schedule = immediate_stats::__internal::PreUpdate,
+                    in_set = immediate_stats::StatSystems::Reset,
+                )]
                 use immediate_stats::reset_component_modifiers as #use_as;
             });
         }
@@ -58,7 +63,12 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
             let use_as = format_ident!("__{ident}_resource");
 
             tokens.extend(quote! {
-                #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
+                #[bevy_butler::add_system(
+                    generics = <#ident>,
+                    plugin = #plugin,
+                    schedule = immediate_stats::__internal::PreUpdate,
+                    in_set = immediate_stats::StatSystems::Reset,
+                )]
                 use immediate_stats::reset_resource_modifiers as #use_as;
             });
         }

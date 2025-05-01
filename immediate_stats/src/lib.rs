@@ -165,7 +165,9 @@ pub use bevy::*;
 // Used by derive macro.
 #[cfg(feature = "bevy")]
 #[doc(hidden)]
-pub use bevy_app::prelude::PreUpdate;
+pub mod __internal {
+    pub use bevy_app::prelude::PreUpdate;
+}
 
 /// Types that contain stats that need to be reset.
 ///

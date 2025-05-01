@@ -6,7 +6,9 @@ use bevy_butler::*;
 use immediate_stats::*;
 
 fn main() {
-    App::new().add_plugins((MinimalPlugins, SpeedPlugin)).run();
+    App::new()
+        .add_plugins((MinimalPlugins, ImmediateStatsPlugin, SpeedPlugin))
+        .run();
 }
 
 #[butler_plugin]
@@ -21,7 +23,7 @@ fn init_speed(mut commands: Commands) {
     commands.spawn(Speed(Stat::new(10))); // Set base speed to 10.
 }
 
-#[add_system(plugin = SpeedPlugin, schedule = Update)]
+#[add_system(plugin = SpeedPlugin, schedule = Update, in_set = StatSystems::Modify)]
 fn apply_modifiers(mut speeds: Query<&mut Speed>) {
     for mut speed in &mut speeds {
         speed.0 *= 2.0; // Applies a multiplier to the final result.
@@ -30,8 +32,7 @@ fn apply_modifiers(mut speeds: Query<&mut Speed>) {
     }
 }
 
-// Modifiers must be applied before the speed can be read.
-#[add_system(plugin = SpeedPlugin, schedule = Update, after = apply_modifiers)]
+#[add_system(plugin = SpeedPlugin, schedule = Update, in_set = StatSystems::Read)]
 fn read_speed(speeds: Query<&Speed>) {
     for speed in &speeds {
         println!("The current speed is {}.", speed.0.total());
