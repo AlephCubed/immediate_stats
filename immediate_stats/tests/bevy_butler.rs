@@ -1,6 +1,7 @@
 //! Tests the `add_component` attribute for automatic system registration.
 #![cfg(feature = "bevy_butler")]
 
+extern crate immediate_stats;
 use crate::{Stat, StatContainer};
 use bevy_app::App;
 use bevy_butler::*;
@@ -12,7 +13,7 @@ struct MyPlugin;
 
 #[derive(Resource, Component, StatContainer, Default, PartialEq, Debug)]
 #[add_component(plugin = MyPlugin)]
-#[add_resource(plugin = MyPlugin)]
+#[insert_resource(plugin = MyPlugin)]
 struct Health(Stat);
 
 #[test]
@@ -60,7 +61,7 @@ fn reset_resource_auto() {
 
 #[derive(Resource, Component, StatContainer, Default, PartialEq, Debug)]
 #[add_component(plugin(MyPlugin))]
-#[add_resource(plugin(MyPlugin))]
+#[insert_resource(plugin(MyPlugin))]
 struct AlternateSyntax(Stat);
 
 #[test]

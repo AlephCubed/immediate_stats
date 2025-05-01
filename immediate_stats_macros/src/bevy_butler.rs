@@ -14,7 +14,7 @@ pub fn register_systems(input: DeriveInput) -> darling::Result<TokenStream> {
         if attr.path().is_ident("add_component") {
             let plugin = PluginPath::from_meta(&attr.meta)?;
             butler_attributes.component_plugin = Some(plugin);
-        } else if attr.path().is_ident("add_resource") {
+        } else if attr.path().is_ident("insert_resource") {
             let plugin = PluginPath::from_meta(&attr.meta)?;
             butler_attributes.resource_plugin = Some(plugin);
         }
@@ -46,8 +46,15 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
             let plugin = &plugin_path.0;
             let use_as = format_ident!("__{ident}_component");
 
+            // Due to some strange import scoping issues, we cannot use the plugins.
+            // Instead, we can just recreate the plugin's functionality.
             tokens.extend(quote! {
-                #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
+                #[bevy_butler::add_system(
+                    generics = <#ident>,
+                    plugin = #plugin,
+                    schedule = immediate_stats::__PreUpdate,
+                    in_set = immediate_stats::StatSystems::Reset,
+                )]
                 use immediate_stats::reset_component_modifiers as #use_as;
             });
         }
@@ -57,8 +64,15 @@ impl<'a> ToTokens for ButlerAttributes<'a> {
             let plugin = &plugin_path.0;
             let use_as = format_ident!("__{ident}_resource");
 
+            // Due to some strange import scoping issues, we cannot use the plugins.
+            // Instead, we can just recreate the plugin's functionality.
             tokens.extend(quote! {
-                #[bevy_butler::add_system(generics = <#ident>, plugin = #plugin, schedule = immediate_stats::PreUpdate)]
+                #[bevy_butler::add_system(
+                    generics = <#ident>,
+                    plugin = #plugin,
+                    schedule = immediate_stats::__PreUpdate,
+                    in_set = immediate_stats::StatSystems::Reset,
+                )]
                 use immediate_stats::reset_resource_modifiers as #use_as;
             });
         }
