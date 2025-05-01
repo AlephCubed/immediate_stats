@@ -43,14 +43,17 @@ fn main() {
 ### Bevy Butler
 
 If you use [Bevy Butler](https://github.com/TGRCdev/bevy-butler/), you can also use the `bevy_butler` feature flag.
-This automatically registers the required system(s) using the `add_component` attribute.
+This automatically registers the required system(s) using the `add_component` attribute
+or the existing `add_resource` macro.
 
 ```rust
 #[butler_plugin]
 struct MyPlugin;
 
-#[derive(StatContainer, Component)]
-#[add_component(plugin = MyPlugin)] // Added by `StatContainer` derive.
+// `StatContainer` derive adds the `add_component` attribute and hooks into the existing `add_resource` macro.
+#[derive(StatContainer, Component, Resource, Default)]
+#[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+#[add_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 struct Speed(Stat);
 ```
 

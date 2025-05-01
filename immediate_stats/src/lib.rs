@@ -1,10 +1,8 @@
 //! Game stats that reset every frame, inspired by immediate mode rendering.
 //!
 //! This makes it easy to implement temporary buffs/debuffs, and effects that change over time.
-//! Using a derive macro, stat resets are propagated to any stat fields,
+//! Using a [derive macro](macro@StatContainer), stat resets are propagated to any stat fields,
 //! making it easy to compose stats into more complex or specific objects.
-//!
-//! Includes a [derive macro](macro@StatContainer) which propagates stat resets to any stat fields.
 //!
 //! ```rust no_run
 //! # use immediate_stats::*;
@@ -53,7 +51,8 @@
 //!
 //! If you use [Bevy Butler](https://github.com/TGRCdev/bevy-butler/),
 //! you can also use the `bevy_butler` feature flag.
-//! This automatically registers the required system(s) using the `add_component` attribute.
+//! This automatically registers the required system(s) using the `add_component` attribute
+//! or the existing `add_resource` macro.
 //!
 #![cfg_attr(not(feature = "bevy_butler"), doc = "```rust ignore")]
 #![cfg_attr(feature = "bevy_butler", doc = "```rust")]
@@ -83,7 +82,7 @@ mod modifier;
 mod stat;
 
 /// Implements [`reset_modifiers`](StatContainer::reset_modifiers)
-/// by propagating the call down to any `StatContainer` fields.
+/// by propagating the call down to any stat fields.
 /// ```rust
 /// # use immediate_stats::*;
 /// #[derive(StatContainer, Default, Debug, PartialEq)]
@@ -104,7 +103,8 @@ mod stat;
 /// }
 /// ```
 /// # Configuration
-/// By default, it will consider any field whose type contains "Stat" to be a sub-stat.
+/// By default, the macro will consider any field whose type contains the word "Stat"
+/// to be a sub-stat.
 /// You can use `#[stat]` to add other sub-stats and `#[stat_ignore]` to ignore one.
 /// ```rust
 /// # use immediate_stats::*;
@@ -124,7 +124,7 @@ mod stat;
 /// fn main () {
 ///     let mut partial = PartialReset {
 ///         custom: Health::default(),
-///         ignored: Stat::new(1),
+///         ignored: Stat::default(),
 ///     };
 ///
 ///     partial.custom.max += 10;
@@ -133,12 +133,13 @@ mod stat;
 ///     partial.reset_modifiers();
 ///
 ///     assert_eq!(partial.custom, Health::default());
-///     assert_eq!(partial.ignored, Stat::new(1).with_bonus(10));
+///     assert_eq!(partial.ignored, Stat::default().with_bonus(10));
 /// }
 /// ```
 /// # Bevy Butler
 /// If the `bevy_butler` feature flag is enabled, you may also use the `add_component` attribute
-/// to register [`reset_component_modifiers`] and/or [`reset_resource_modifiers`] automatically.
+/// or the existing `add_resource` macro to register [`reset_component_modifiers`]
+/// and/or [`reset_resource_modifiers`] automatically.
 #[cfg_attr(not(feature = "bevy_butler"), doc = "```rust ignore")]
 #[cfg_attr(feature = "bevy_butler", doc = "```rust")]
 /// # use bevy_butler::*;
@@ -168,10 +169,9 @@ pub use bevy_app::prelude::PreUpdate;
 
 /// Types that contain stats that need to be reset.
 ///
-/// It is recommended to use the [derive macro](macro@StatContainer)
-/// instead of implementing manually.
+/// Consider using the [derive macro](macro@StatContainer) before implementing manually.
 #[cfg_attr(feature = "bevy", bevy_reflect::reflect_trait)]
 pub trait StatContainer {
-    /// Resets all stat bonuses to zero, and stat multipliers to one.
+    /// Resets all stats to a base value. For most use-cases, this should be called every frame/iteration.
     fn reset_modifiers(&mut self);
 }
