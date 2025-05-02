@@ -3,6 +3,7 @@
 
 use immediate_stats::*;
 
+// Implements `reset_modifiers` by passing the call onto `Stat`.
 #[derive(StatContainer)]
 struct Speed(Stat);
 
@@ -13,7 +14,7 @@ fn main() {
         // 1. Apply modifiers:
         speed.0 *= 2.0; // Applies a multiplier to the final result.
         speed.0 += 5; // Adds a bonus to the final result.
-        // The order does not matter. Bonuses are always applied before multipliers.
+        // The order does not matter, bonuses are always applied before multipliers.
 
         // 2. Read total:
         println!("The current speed is {}.", speed.0.total());

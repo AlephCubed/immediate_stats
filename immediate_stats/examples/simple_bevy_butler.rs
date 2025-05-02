@@ -14,6 +14,8 @@ fn main() {
 #[butler_plugin]
 struct SpeedPlugin;
 
+// Implements `reset_modifiers` by passing the call onto `Stat`.
+// This will also add the `ResetComponentPlugin` to `SpeedPlugin`.
 #[derive(StatContainer, Component)]
 #[add_component(plugin = SpeedPlugin)]
 struct Speed(Stat);
@@ -28,7 +30,7 @@ fn apply_modifiers(mut speeds: Query<&mut Speed>) {
     for mut speed in &mut speeds {
         speed.0 *= 2.0; // Applies a multiplier to the final result.
         speed.0 += 5; // Adds a bonus to the final result.
-        // The order does not matter. Bonuses are always applied before multipliers.
+        // The order does not matter, bonuses are always applied before multipliers.
     }
 }
 
