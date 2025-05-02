@@ -1,6 +1,6 @@
 [package]
 name = "immediate_stats"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "Game stats that reset every frame, inspired by immediate mode rendering."
 categories = ["game-development", "data-structures"]
@@ -9,6 +9,9 @@ repository = "https://github.com/AlephCubed/immediate_stats"
 license = "MIT OR Apache-2.0"
 authors = ["AlephCubed"]
 readme = "../README.md"
+
+[package.metadata.docs.rs]
+all-features = true
 
 [features]
 bevy = ["bevy_ecs", "bevy_app", "bevy_reflect", "immediate_stats_macros/bevy"]
