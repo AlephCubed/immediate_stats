@@ -22,7 +22,7 @@ bevy_ecs = { version = "0.16.0", default-features = false, optional = true, feat
   "bevy_reflect",
 ] }
 bevy_reflect = { version = "0.16.0", default-features = false, optional = true }
-immediate_stats_macros = { path = "../immediate_stats_macros", default-features = false }
+immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.1.0", default-features = false }
 
 [dev-dependencies]
 bevy = { version = "0.16.0", default-features = false }
