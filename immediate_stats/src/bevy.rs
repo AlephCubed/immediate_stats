@@ -40,15 +40,17 @@ pub enum StatSystems {
     Read,
 }
 
-/// Prevents any [`StatContainers`](StatContainer) on an entity from resetting.
+/// Prevents all [`StatContainers`](StatContainer)
+/// on an entity from getting reset by [`ResetComponentPlugin`].
 #[derive(Component, Reflect, Eq, PartialEq, Debug, Default, Clone)]
 #[component(storage = "SparseSet")]
 #[reflect(Component, PartialEq, Debug, Default, Clone)]
 pub struct PauseStatReset;
 
 /// Calls [`reset_modifiers`](StatContainer::reset_modifiers) on all `T` components.
+/// This can be paused on a per-entity basis using the [`PauseStatReset`] component.
 ///
-/// Reset occurs in the [`Reset`](StatSystems::Reset) system set during [`PreUpdate`].
+/// Reset occurs in the [`Reset`](StatSystems::Reset) system set during `PreUpdate`.
 pub struct ResetComponentPlugin<T: Component<Mutability = Mutable> + StatContainer> {
     _phantom: PhantomData<T>,
 }
@@ -63,6 +65,7 @@ impl<T: Component<Mutability = Mutable> + StatContainer> Plugin for ResetCompone
 }
 
 /// Calls [`reset_modifiers`](StatContainer::reset_modifiers) on all `T` components.
+/// This can be paused on a per-entity basis using the [`PauseStatReset`] component.
 ///
 /// Use the [`ResetResourcePlugin`] for recommended configuration.
 pub fn reset_component_modifiers<T: Component<Mutability = Mutable> + StatContainer>(
@@ -90,7 +93,7 @@ impl<T: Component<Mutability = Mutable> + StatContainer> Default for ResetCompon
 
 /// Calls [`reset_modifiers`](StatContainer::reset_modifiers) on the `T` resource, if it exists.
 ///
-/// Reset occurs in the [`Reset`](StatSystems::Reset) system set during [`PreUpdate`].
+/// Reset occurs in the [`Reset`](StatSystems::Reset) system set during `PreUpdate`.
 pub struct ResetResourcePlugin<T: Resource + StatContainer> {
     _phantom: PhantomData<T>,
 }

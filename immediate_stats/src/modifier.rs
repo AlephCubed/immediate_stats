@@ -10,7 +10,7 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
     reflect(PartialEq, Debug, Clone)
 )]
 pub struct Modifier {
-    /// Added to `base` of a [`Stat`](super::Stat) during calculation.
+    /// Added to the `base` of a [`Stat`](super::Stat) during calculation.
     ///
     /// Can be modified using [`+=`](Modifier::add_assign) and [`-=`](`Modifier::sub_assign`).
     pub bonus: i32,

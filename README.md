@@ -4,7 +4,7 @@ Game stats that reset every frame, inspired by immediate mode rendering.
 
 This makes it easy to implement temporary buffs/debuffs, and effects that change over time.
 Using a derive macro, stat resets are propagated to any stat fields, 
-making it easy to compose stats into more complex or specific objects.
+making it easy to compose stats into more complex objects.
 
 ```rust
 #[derive(StatContainer)]
@@ -16,7 +16,7 @@ fn main() {
     loop {
         speed.0 *= 2.0; // Applies a multiplier to the final result.
         speed.0 += 5; // Adds a bonus to the final result.
-        // The order does not matter. Bonuses are always applied before multipliers.
+        // The order does not matter, bonuses are always applied before multipliers.
         assert_eq!(speed.0.total(), 30); // (10 + 5) * 2 = 30
         
         speed.reset_modifiers(); // Reset bonus and multiplier, so speed is back to 10.
@@ -27,7 +27,7 @@ fn main() {
 ## Bevy
 
 There is build-in integration with the [Bevy Engine](https://bevyengine.org) via the `bevy` feature flag.
-This adds systems for resetting `StatContainer` components and resources.
+This adds plugins for resetting `StatContainer` components and resources.
 
 ```rust
 #[derive(StatContainer, Component, Resource)]
@@ -36,6 +36,7 @@ struct Speed(Stat);
 fn main() {
     App::new()
         .add_plugins((
+            ImmediateStatsPlugin,
             ResetComponentPlugin::<Speed>::new(),
             ResetResourcePlugin::<Speed>::new(),
         ))
@@ -50,6 +51,10 @@ This automatically registers the required system(s) using the `add_component` at
 or the existing `insert_resource` macro.
 
 ```rust
+fn main() {
+    App::new().add_plugins((ImmediateStatsPlugin, MyPlugin)).run();
+}
+
 #[butler_plugin]
 struct MyPlugin;
 

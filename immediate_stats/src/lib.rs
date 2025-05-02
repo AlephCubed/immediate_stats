@@ -2,7 +2,7 @@
 //!
 //! This makes it easy to implement temporary buffs/debuffs, and effects that change over time.
 //! Using a [derive macro](macro@StatContainer), stat resets are propagated to any stat fields,
-//! making it easy to compose stats into more complex or specific objects.
+//! making it easy to compose stats into more complex objects.
 //!
 //! ```rust no_run
 //! # use immediate_stats::*;
@@ -10,12 +10,12 @@
 //! struct Speed(Stat);
 //!
 //! fn main() {
+//!     let mut speed = Speed(Stat::new(10)); // Set base speed to 10.
+//!     
 //!     loop {
-//!         let mut speed = Speed(Stat::new(10)); // Set base speed to 10.
-//!
 //!         speed.0 *= 2.0; // Applies a multiplier to the final result.
 //!         speed.0 += 5; // Adds a bonus to the final result.
-//!         // The order does not matter. Bonuses are always applied before multipliers.
+//!         // The order does not matter, bonuses are always applied before multipliers.
 //!         assert_eq!(speed.0.total(), 30); // (10 + 5) * 2 = 30
 //!
 //!         speed.reset_modifiers(); // Reset speed back to 10.
@@ -40,6 +40,7 @@
 //! fn main() {
 //!     App::new()
 //!         .add_plugins((
+//!             ImmediateStatsPlugin,
 //!             ResetComponentPlugin::<Speed>::new(),
 //!             ResetResourcePlugin::<Speed>::new(),
 //!         ))
@@ -60,14 +61,18 @@
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
 //! # use bevy_butler::*;
+//! fn main() {
+//!     App::new().add_plugins((ImmediateStatsPlugin, MyPlugin)).run();
+//! }
+//!
 //! #[butler_plugin]
 //! struct MyPlugin;
 //!
 //! // `StatContainer` derive adds the `add_component` attribute
 //! // and hooks into the existing `insert_resource` macro.
 //! #[derive(StatContainer, Component, Resource, Default)]
-//! #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-//! #[insert_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+//! #[add_component(plugin = MyPlugin)] // Adds `ResetComponentPlugin`
+//! #[insert_resource(plugin = MyPlugin)] // Adds `ResetResourcePlugin`
 //! struct Speed(Stat);
 //! ```
 //!
