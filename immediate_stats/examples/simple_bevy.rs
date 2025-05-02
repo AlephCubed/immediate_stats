@@ -5,26 +5,31 @@ use bevy::prelude::*;
 use immediate_stats::*;
 
 fn main() {
-    App::new().add_plugins((MinimalPlugins, SpeedPlugin)).run();
+    App::new()
+        .add_plugins((MinimalPlugins, ImmediateStatsPlugin, SpeedPlugin))
+        .run();
 }
 
 struct SpeedPlugin;
 
 impl Plugin for SpeedPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((ImmediateStatsPlugin, ResetComponentPlugin::<Speed>::new()))
-            .add_systems(Startup, init_speed)
-            .add_systems(
-                Update,
-                (
-                    // Modifiers must be applied before the speed can be read.
-                    apply_modifiers.in_set(StatSystems::Modify),
-                    read_speed.in_set(StatSystems::Read),
-                ),
-            );
+        app.add_plugins(
+            ResetComponentPlugin::<Speed>::new(), // Reset modifiers, so speed is back to 10.
+        )
+        .add_systems(Startup, init_speed)
+        .add_systems(
+            Update,
+            (
+                // Modifiers must be applied before the speed can be read.
+                apply_modifiers.in_set(StatSystems::Modify),
+                read_speed.in_set(StatSystems::Read),
+            ),
+        );
     }
 }
 
+// Implements `reset_modifiers` by passing the call onto `Stat`.
 #[derive(StatContainer, Component)]
 struct Speed(Stat);
 
@@ -36,7 +41,7 @@ fn apply_modifiers(mut speeds: Query<&mut Speed>) {
     for mut speed in &mut speeds {
         speed.0 *= 2.0; // Applies a multiplier to the final result.
         speed.0 += 5; // Adds a bonus to the final result.
-        // The order does not matter. Bonuses are always applied before multipliers.
+        // The order does not matter, bonuses are always applied before multipliers.
     }
 }
 

@@ -9,7 +9,7 @@ use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 /// Temporary bonuses can be applied using [`+=`][add], [`-=`][sub], [`*=`][mul], and [`/=`][div].
 /// During [calculation](Stat::total),
 /// multiplication and division are always applied **after** addition and subtraction.
-/// These bonuses are reset when [`reset_modifiers`][reset] is called.
+/// These modifiers are reset when [`reset_modifiers`][reset] is called.
 ///
 /// [reset]: StatContainer::reset_modifiers
 /// [add]: Stat::add_assign
@@ -26,15 +26,15 @@ pub struct Stat {
     /// The persistent value of the stat.
     /// After being [reset](StatContainer::reset_modifiers), [`Stat::total`] will be equal to `base`.
     pub base: i32,
-    /// Added to `base` during calculation and gets reset to zero every iteration.
-    /// This is added *before* `multiplier` is applied.
+    /// Added to `base` during calculation and gets [reset](StatContainer::reset_modifiers) to zero.
+    /// This is added **before** `multiplier` is applied.
     ///
     /// Can be modified using [`+=`](Stat::add_assign) or [`-=`](Stat::sub_assign).
     pub bonus: i32,
     /// Multiplies the `base` during calculation and gets reset to one every iteration.
-    /// This is applied *after* `bonus` is added.
+    /// This is applied **after** `bonus` is added.
     ///
-    /// Can be modified using [*=](`Stat::mul_assign`) or [/=](`Stat::div_assign`).
+    /// Can be modified using [`*=`](`Stat::mul_assign`) or [`/=`](`Stat::div_assign`).
     pub multiplier: f32,
 }
 
