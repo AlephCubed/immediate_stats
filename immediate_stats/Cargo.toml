@@ -10,6 +10,9 @@ license = "MIT OR Apache-2.0"
 authors = ["AlephCubed"]
 readme = "../README.md"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [features]
 bevy = ["bevy_ecs", "bevy_app", "bevy_reflect", "immediate_stats_macros/bevy"]
 bevy_butler = ["bevy", "bevy-butler", "immediate_stats_macros/bevy_butler"]

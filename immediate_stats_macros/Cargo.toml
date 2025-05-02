@@ -10,6 +10,9 @@ license = "MIT OR Apache-2.0"
 authors = ["AlephCubed"]
 readme = "../README.md"
 
+[package.metadata.docs.rs]
+all-features = true
+
 [lib]
 proc-macro = true
 
