@@ -8,6 +8,7 @@ keywords = ["game", "gamedev", "bevy", "stats", "proc-macro"]
 repository = "https://github.com/AlephCubed/immediate_stats"
 license = "MIT OR Apache-2.0"
 authors = ["AlephCubed"]
+readme = "../README.md"
 
 [lib]
 proc-macro = true
