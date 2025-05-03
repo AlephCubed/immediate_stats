@@ -1,5 +1,9 @@
 # Immediate Stats
 
+[![Version](https://img.shields.io/crates/v/immediate_stats)](https://crates.io/crates/immediate_stats)
+[![Docs](https://img.shields.io/docsrs/immediate_stats)](https://docs.rs/immediate_stats)
+![License](https://img.shields.io/crates/l/immediate_stats)
+
 Game stats that reset every frame, inspired by immediate mode rendering.
 
 This makes it easy to implement temporary buffs/debuffs, and effects that change over time.
