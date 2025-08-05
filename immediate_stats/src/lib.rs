@@ -1,4 +1,4 @@
-//! Game stats that reset every frame, inspired by immediate mode rendering.
+//! Game stats that reset every frame, inspired by immediate mode GUI.
 //!
 //! This makes it easy to implement temporary buffs/debuffs, and effects that change over time.
 //! Using a [derive macro](macro@StatContainer), stat resets are propagated to any stat fields,
