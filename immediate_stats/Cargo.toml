@@ -1,6 +1,6 @@
 [package]
 name = "immediate_stats"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
 description = "Game stats that reset every frame, inspired by immediate mode rendering."
 categories = ["game-development", "data-structures"]
@@ -26,7 +26,7 @@ bevy_ecs = { version = "0.16.0", default-features = false, optional = true, feat
   "bevy_reflect",
 ] }
 bevy_reflect = { version = "0.16.0", default-features = false, optional = true }
-immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.1.0", default-features = false }
+immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.1.3", default-features = false }
 
 [dev-dependencies]
 bevy = { version = "0.16.0", default-features = false }
