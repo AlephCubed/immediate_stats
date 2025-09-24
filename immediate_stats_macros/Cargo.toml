@@ -19,9 +19,10 @@ proc-macro = true
 [features]
 bevy = []
 bevy_butler = ["bevy"]
+bevy_auto_plugin = ["bevy"]
 
 [dependencies]
-darling = "0.20.11"
+darling = "0.21.3"
 proc-macro2 = "1.0"
 proc-macro-error = "1.0"
 quote = "1.0"

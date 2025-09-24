@@ -48,25 +48,24 @@ fn main() {
 }
 ```
 
-### Bevy Butler
+### Bevy Auto Plugin
 
-If you use [Bevy Butler](https://github.com/TGRCdev/bevy-butler/), you can also use the `bevy_butler` feature flag.
-This automatically registers the required system(s) using the `add_component` attribute
-or the existing `insert_resource` macro.
+If you use [Bevy Auto Plugin](https://github.com/strikeforcezero/bevy_auto_plugin/), you can also use the `bevy_auto_plugin` feature flag.
+This automatically registers the required system(s) by leveraging the existing `auto_component` and `auto_resource` macros.
 
 ```rust
 fn main() {
     App::new().add_plugins((ImmediateStatsPlugin, MyPlugin)).run();
 }
 
-#[butler_plugin]
+#[derive(AutoPlugin)]
+#[auto_plugin(impl_plugin_trait)]
 struct MyPlugin;
 
-// `StatContainer` derive adds the `add_component` attribute 
-// and hooks into the existing `insert_resource` macro.
+// `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
 #[derive(StatContainer, Component, Resource)]
-#[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-#[insert_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+#[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+#[auto_init_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 struct Speed(Stat);
 ```
 

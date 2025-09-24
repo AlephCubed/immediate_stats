@@ -48,31 +48,30 @@
 //! }
 //! ```
 //!
-//! ### Bevy Butler
+//! ### Bevy Auto Plugin
 //!
-//! If you use [Bevy Butler](https://github.com/TGRCdev/bevy-butler/),
-//! you can also use the `bevy_butler` feature flag.
-//! This automatically registers the required system(s) using the `add_component` attribute
-//! or the existing `insert_resource` macro.
+//! If you use [Bevy Auto Plugin](https://github.com/strikeforcezero/bevy_auto_plugin/),
+//! you can also use the `bevy_auto_plugin` feature flag. This automatically registers the required
+//! system(s) by leveraging the existing `auto_component` and `auto_resource` macros.
 //!
-#![cfg_attr(not(feature = "bevy_butler"), doc = "```rust ignore")]
-#![cfg_attr(feature = "bevy_butler", doc = "```rust")]
+#![cfg_attr(not(feature = "bevy_auto_plugin"), doc = "```rust ignore")]
+#![cfg_attr(feature = "bevy_auto_plugin", doc = "```rust")]
 //! # use bevy_app::prelude::*;
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
-//! # use bevy_butler::*;
+//! # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_init_resource};
 //! fn main() {
 //!     App::new().add_plugins((ImmediateStatsPlugin, MyPlugin)).run();
 //! }
 //!
-//! #[butler_plugin]
+//! #[derive(AutoPlugin)]
+//! #[auto_plugin(impl_plugin_trait)]
 //! struct MyPlugin;
 //!
-//! // `StatContainer` derive adds the `add_component` attribute
-//! // and hooks into the existing `insert_resource` macro.
-//! #[derive(StatContainer, Component, Resource, Default)]
-//! #[add_component(plugin = MyPlugin)] // Adds `ResetComponentPlugin`
-//! #[insert_resource(plugin = MyPlugin)] // Adds `ResetResourcePlugin`
+//! // `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
+//! #[derive(StatContainer, Component, Resource)]
+//! #[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+//! #[auto_init_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 //! struct Speed(Stat);
 //! ```
 //!
@@ -141,23 +140,24 @@ mod stat;
 ///     assert_eq!(partial.ignored, Stat::default().with_bonus(10));
 /// }
 /// ```
-/// # Bevy Butler
-/// If the `bevy_butler` feature flag is enabled, you may also use the `add_component` attribute
-/// or the existing `insert_resource` macro to register [`reset_component_modifiers`]
-/// and/or [`reset_resource_modifiers`] automatically.
-#[cfg_attr(not(feature = "bevy_butler"), doc = "```rust ignore")]
-#[cfg_attr(feature = "bevy_butler", doc = "```rust")]
-/// # use bevy_butler::*;
+/// # Bevy Auto Plugin
+/// If the `bevy_auto_plugin` feature flag is enabled, the existing `auto_component` and
+/// `auto_resource` macros will register [`reset_component_modifiers`] and/or
+/// [`reset_resource_modifiers`] automatically.
+#[cfg_attr(not(feature = "bevy_auto_plugin"), doc = "```rust ignore")]
+#[cfg_attr(feature = "bevy_auto_plugin", doc = "```rust")]
+/// # use bevy_app::prelude::*;
 /// # use bevy_ecs::prelude::*;
 /// # use immediate_stats::*;
-/// #[butler_plugin]
+/// # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_init_resource};
+/// #[derive(AutoPlugin)]
+/// #[auto_plugin(impl_plugin_trait)]
 /// struct MyPlugin;
 ///
-/// // `StatContainer` derive adds the `add_component` attribute
-/// // and hooks into the existing `insert_resource` macro.
-/// #[derive(StatContainer, Component, Resource, Default)]
-/// #[add_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-/// #[insert_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+/// // `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
+/// #[derive(StatContainer, Component, Resource)]
+/// #[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
+/// #[auto_init_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 /// struct Speed(Stat);
 /// ```
 pub use immediate_stats_macros::StatContainer;

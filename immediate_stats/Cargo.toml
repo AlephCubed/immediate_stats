@@ -14,14 +14,25 @@ readme = "../README.md"
 all-features = true
 
 [features]
-bevy = ["bevy_ecs", "bevy_app", "bevy_reflect", "immediate_stats_macros/bevy"]
-bevy_butler = ["bevy", "bevy-butler", "immediate_stats_macros/bevy_butler"]
+bevy = [
+  "dep:bevy_ecs",
+  "dep:bevy_app",
+  "dep:bevy_reflect",
+  "immediate_stats_macros/bevy",
+]
+bevy_butler = ["bevy", "dep:bevy-butler", "immediate_stats_macros/bevy_butler"]
+bevy_auto_plugin = [
+  "bevy",
+  "dep:bevy_auto_plugin",
+  "immediate_stats_macros/bevy_auto_plugin",
+]
 
 [dependencies]
 bevy_app = { version = "0.16.0", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
 bevy-butler = { version = "0.6.1", optional = true }
+bevy_auto_plugin = { version = "0.5.0", optional = true }
 bevy_ecs = { version = "0.16.0", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
@@ -51,3 +62,8 @@ required-features = ["bevy"]
 name = "simple_bevy_butler"
 path = "examples/simple_bevy_butler.rs"
 required-features = ["bevy_butler"]
+
+[[example]]
+name = "simple_bevy_auto_plugin"
+path = "examples/simple_bevy_auto_plugin.rs"
+required-features = ["bevy_auto_plugin"]
