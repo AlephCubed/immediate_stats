@@ -1,5 +1,5 @@
 //! A very simple example using a main loop.
-//! There are two other versions of this example, one using Bevy and the other using Bevy Butler.
+//! There are two other versions of this example, one using Bevy and the other using Bevy Auto Plugin.
 
 use immediate_stats::*;
 

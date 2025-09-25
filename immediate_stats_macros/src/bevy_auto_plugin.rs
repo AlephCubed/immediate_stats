@@ -4,32 +4,35 @@ use proc_macro2::{Ident, TokenStream};
 use quote::{ToTokens, format_ident, quote};
 use syn::{DeriveInput, Expr, Meta, Path};
 
-/// Returns code that will register stat resetting system(s) with Bevy Butler.
+/// Returns code that will register stat resetting system(s) with Bevy Auto Plugin.
 pub fn register_systems(input: &DeriveInput) -> darling::Result<TokenStream> {
     let struct_name = &input.ident;
 
-    let mut butler_attributes = ButlerAttributes::new(struct_name);
+    let mut auto_plugin_attributes = AutoPluginAttributes::new(struct_name);
 
     for attr in &input.attrs {
-        if attr.path().is_ident("add_component") {
+        if attr.path().is_ident("auto_component") {
             let plugin = PluginPath::from_meta(&attr.meta)?;
-            butler_attributes.component_plugin = Some(plugin);
-        } else if attr.path().is_ident("insert_resource") {
+            auto_plugin_attributes.component_plugin = Some(plugin);
+        } else if attr.path().is_ident("auto_resource")
+            || attr.path().is_ident("auto_init_resource")
+            || attr.path().is_ident("auto_insert_resource")
+        {
             let plugin = PluginPath::from_meta(&attr.meta)?;
-            butler_attributes.resource_plugin = Some(plugin);
+            auto_plugin_attributes.resource_plugin = Some(plugin);
         }
     }
 
-    Ok(butler_attributes.into_token_stream())
+    Ok(auto_plugin_attributes.into_token_stream())
 }
 
-pub struct ButlerAttributes<'a> {
+pub struct AutoPluginAttributes<'a> {
     ident: &'a Ident,
     component_plugin: Option<PluginPath>,
     resource_plugin: Option<PluginPath>,
 }
 
-impl<'a> ButlerAttributes<'a> {
+impl<'a> AutoPluginAttributes<'a> {
     pub fn new(ident: &'a Ident) -> Self {
         Self {
             ident,
@@ -39,41 +42,49 @@ impl<'a> ButlerAttributes<'a> {
     }
 }
 
-impl<'a> ToTokens for ButlerAttributes<'a> {
+impl<'a> ToTokens for AutoPluginAttributes<'a> {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         if let Some(plugin_path) = &self.component_plugin {
             let ident = &self.ident;
             let plugin = &plugin_path.0;
-            let use_as = format_ident!("__{ident}_component");
+            let system_ident = format_ident!("__reset_{ident}_component_modifiers");
 
-            // Due to some strange import scoping issues, we cannot use the plugins.
-            // Instead, we can just recreate the plugin's functionality.
             tokens.extend(quote! {
-                #[bevy_butler::add_system(
-                    generics = <#ident>,
+                #[bevy_auto_plugin::modes::global::prelude::auto_system(
                     plugin = #plugin,
                     schedule = immediate_stats::__PreUpdate,
-                    in_set = immediate_stats::StatSystems::Reset,
+                    config(
+                        in_set = immediate_stats::StatSystems::Reset,
+                    )
                 )]
-                use immediate_stats::reset_component_modifiers as #use_as;
+                fn #system_ident(
+                    mut query: Query<&mut #ident, Without<immediate_stats::PauseStatReset>>,
+                ) {
+                    for mut stat in &mut query {
+                        stat.reset_modifiers();
+                    }
+                }
             });
         }
 
         if let Some(plugin_path) = &self.resource_plugin {
             let ident = &self.ident;
             let plugin = &plugin_path.0;
-            let use_as = format_ident!("__{ident}_resource");
+            let system_ident = format_ident!("__reset_{ident}_resource_modifiers");
 
-            // Due to some strange import scoping issues, we cannot use the plugins.
-            // Instead, we can just recreate the plugin's functionality.
             tokens.extend(quote! {
-                #[bevy_butler::add_system(
-                    generics = <#ident>,
+                #[bevy_auto_plugin::modes::global::prelude::auto_system(
                     plugin = #plugin,
                     schedule = immediate_stats::__PreUpdate,
-                    in_set = immediate_stats::StatSystems::Reset,
+                    config(
+                        in_set = immediate_stats::StatSystems::Reset,
+                    )
                 )]
-                use immediate_stats::reset_resource_modifiers as #use_as;
+                fn #system_ident(res: Option<ResMut<#ident>>) {
+                    if let Some(mut res) = res {
+                        res.reset_modifiers();
+                    }
+                }
             });
         }
     }
@@ -107,7 +118,7 @@ impl FromMeta for PluginPath {
                     }
                     Meta::NameValue(name_value) => match &name_value.value {
                         Expr::Path(p) => Ok(PluginPath(p.path.clone())),
-                        _ => Err(Error::custom("Expected a path to a butler plugin")),
+                        _ => Err(Error::custom("Expected a path to an auto plugin")),
                     },
                 },
                 NestedMeta::Lit(_) => Err(Error::custom("Expected `plugin` attribute")),

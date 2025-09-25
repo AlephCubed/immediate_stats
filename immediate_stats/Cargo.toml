@@ -1,6 +1,6 @@
 [package]
 name = "immediate_stats"
-version = "0.2.0-rc.1"
+version = "0.3.0-rc.1"
 edition = "2024"
 description = "Game stats that reset every frame, inspired by immediate mode GUI."
 categories = ["game-development", "data-structures"]
@@ -14,8 +14,18 @@ readme = "../README.md"
 all-features = true
 
 [features]
-bevy = ["bevy_ecs", "bevy_app", "bevy_reflect", "immediate_stats_macros/bevy"]
-bevy_butler = ["bevy", "bevy-butler", "immediate_stats_macros/bevy_butler"]
+bevy = [
+  "dep:bevy_ecs",
+  "dep:bevy_app",
+  "dep:bevy_reflect",
+  "immediate_stats_macros/bevy",
+]
+bevy_butler = ["bevy", "dep:bevy-butler", "immediate_stats_macros/bevy_butler"]
+bevy_auto_plugin = [
+  "bevy",
+  "dep:bevy_auto_plugin",
+  "immediate_stats_macros/bevy_auto_plugin",
+]
 
 [dependencies]
 bevy_app = { version = "0.17.0-rc.1", default-features = false, optional = true, features = [
@@ -26,7 +36,7 @@ bevy_ecs = { version = "0.17.0-rc.1", default-features = false, optional = true,
   "bevy_reflect",
 ] }
 bevy_reflect = { version = "0.17.0-rc.1", default-features = false, optional = true }
-immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.2.0-rc.1", default-features = false }
+immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.3.0-rc.1", default-features = false }
 
 [dev-dependencies]
 bevy = { version = "0.17.0-rc.1", default-features = false }
@@ -51,3 +61,8 @@ required-features = ["bevy"]
 name = "simple_bevy_butler"
 path = "examples/simple_bevy_butler.rs"
 required-features = ["bevy_butler"]
+
+[[example]]
+name = "simple_bevy_auto_plugin"
+path = "examples/simple_bevy_auto_plugin.rs"
+required-features = ["bevy_auto_plugin"]
