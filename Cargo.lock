@@ -1003,7 +1003,7 @@ checksum = "cd62e6b5e86ea8eeeb8db1de02880a6abc01a397b2ebb64b5d74ac255318f5cb"
 
 [[package]]
 name = "immediate_stats"
-version = "0.1.3"
+version = "0.2.0-beta.1"
 dependencies = [
  "bevy",
  "bevy-butler",
@@ -1016,7 +1016,7 @@ dependencies = [
 
 [[package]]
 name = "immediate_stats_macros"
-version = "0.1.3"
+version = "0.2.0-beta.1"
 dependencies = [
  "darling",
  "proc-macro-error",
