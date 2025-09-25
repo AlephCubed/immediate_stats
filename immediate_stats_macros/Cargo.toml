@@ -18,7 +18,6 @@ proc-macro = true
 
 [features]
 bevy = []
-bevy_butler = ["bevy"]
 bevy_auto_plugin = ["bevy"]
 
 [dependencies]
