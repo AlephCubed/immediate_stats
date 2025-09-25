@@ -59,7 +59,7 @@
 //! # use bevy_app::prelude::*;
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
-//! # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_init_resource};
+//! # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_resource};
 //! fn main() {
 //!     App::new().add_plugins((ImmediateStatsPlugin, MyPlugin)).run();
 //! }
@@ -71,7 +71,7 @@
 //! // `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
 //! #[derive(StatContainer, Component, Resource)]
 //! #[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-//! #[auto_init_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+//! #[auto_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 //! struct Speed(Stat);
 //! ```
 //!
@@ -149,7 +149,7 @@ mod stat;
 /// # use bevy_app::prelude::*;
 /// # use bevy_ecs::prelude::*;
 /// # use immediate_stats::*;
-/// # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_init_resource};
+/// # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_resource};
 /// #[derive(AutoPlugin)]
 /// #[auto_plugin(impl_plugin_trait)]
 /// struct MyPlugin;
@@ -157,7 +157,7 @@ mod stat;
 /// // `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
 /// #[derive(StatContainer, Component, Resource)]
 /// #[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-/// #[auto_init_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+/// #[auto_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 /// struct Speed(Stat);
 /// ```
 pub use immediate_stats_macros::StatContainer;

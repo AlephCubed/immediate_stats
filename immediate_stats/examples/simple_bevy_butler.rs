@@ -1,5 +1,5 @@
 //! A very simple example using Bevy Butler. Requires the `bevy_butler` feature flag, which is *depreciated*.
-//! 
+//!
 //! **Please see the Bevy Auto Plugin example instead.**
 
 use bevy::prelude::*;

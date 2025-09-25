@@ -47,40 +47,44 @@ impl<'a> ToTokens for AutoPluginAttributes<'a> {
         if let Some(plugin_path) = &self.component_plugin {
             let ident = &self.ident;
             let plugin = &plugin_path.0;
-            let use_as = format_ident!("__{ident}_component");
+            let system_ident = format_ident!("__reset_{ident}_component_modifiers");
 
-            // Due to some strange import scoping issues, we cannot use the plugins.
-            // Instead, we can just recreate the plugin's functionality.
             tokens.extend(quote! {
                 #[bevy_auto_plugin::modes::global::prelude::auto_system(
-                    generics(#ident),
                     plugin = #plugin,
                     schedule = immediate_stats::__PreUpdate,
                     config(
                         in_set = immediate_stats::StatSystems::Reset,
                     )
                 )]
-                use immediate_stats::reset_component_modifiers as #use_as;
+                fn #system_ident(
+                    mut query: Query<&mut #ident, Without<PauseStatReset>>,
+                ) {
+                    for mut stat in &mut query {
+                        stat.reset_modifiers();
+                    }
+                }
             });
         }
 
         if let Some(plugin_path) = &self.resource_plugin {
             let ident = &self.ident;
             let plugin = &plugin_path.0;
-            let use_as = format_ident!("__{ident}_resource");
+            let system_ident = format_ident!("__reset_{ident}_resource_modifiers");
 
-            // Due to some strange import scoping issues, we cannot use the plugins.
-            // Instead, we can just recreate the plugin's functionality.
             tokens.extend(quote! {
                 #[bevy_auto_plugin::modes::global::prelude::auto_system(
-                    generics(#ident),
                     plugin = #plugin,
                     schedule = immediate_stats::__PreUpdate,
                     config(
                         in_set = immediate_stats::StatSystems::Reset,
                     )
                 )]
-                use immediate_stats::reset_resource_modifiers as #use_as;
+                fn #system_ident(res: Option<ResMut<#ident>>) {
+                    if let Some(mut res) = res {
+                        res.reset_modifiers();
+                    }
+                }
             });
         }
     }
