@@ -58,7 +58,7 @@ impl<'a> ToTokens for AutoPluginAttributes<'a> {
                     )
                 )]
                 fn #system_ident(
-                    mut query: Query<&mut #ident, Without<PauseStatReset>>,
+                    mut query: Query<&mut #ident, Without<immediate_stats::PauseStatReset>>,
                 ) {
                     for mut stat in &mut query {
                         stat.reset_modifiers();
