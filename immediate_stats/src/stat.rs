@@ -85,7 +85,7 @@ impl Stat {
     pub fn apply_scaled(&mut self, modifier: Modifier, fraction: f32) {
         self.bonus += (modifier.bonus as f32 * fraction) as i32;
         // Lerp: https://gist.github.com/laundmo/cb06630109e5e1100f5a2758dfb67cfd
-        self.multiplier *= (1.0 - fraction) * modifier.multiplier + fraction * 1.0;
+        self.multiplier *= (1.0 - fraction) * 1.0 + fraction * modifier.multiplier;
     }
 }
 
