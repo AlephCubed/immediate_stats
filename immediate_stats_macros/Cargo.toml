@@ -1,6 +1,6 @@
 [package]
 name = "immediate_stats_macros"
-version = "0.2.0-beta.1"
+version = "0.2.0"
 edition = "2024"
 description = "Game stats that reset every frame, inspired by immediate mode GUI."
 categories = ["game-development", "data-structures"]

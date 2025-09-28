@@ -65,11 +65,11 @@ struct MyPlugin;
 // `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
 #[derive(StatContainer, Component, Resource)]
 #[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-#[auto_init_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+#[auto_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 struct Speed(Stat);
 ```
 
 ### Version Compatibility
 | Bevy   | Immediate Stats |
 |--------|-----------------|
-| `0.16` | `0.1`           |
+| `0.16` | `0.1` - `0.2`   |

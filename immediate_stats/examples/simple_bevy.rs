@@ -1,5 +1,5 @@
 //! A very simple example using Bevy. Requires the `bevy` feature flag.
-//! There are two other versions of this example, one using a simple main loop and the other using Bevy Butler.
+//! There are two other versions of this example, one using a simple main loop and the other using Bevy Auto Plugin.
 
 use bevy::prelude::*;
 use immediate_stats::*;
