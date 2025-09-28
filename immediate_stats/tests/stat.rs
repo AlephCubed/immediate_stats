@@ -123,3 +123,26 @@ fn apply() {
         }
     )
 }
+
+#[test]
+fn apply_scaled() {
+    let mut stat = Stat::new(10);
+
+    // Should result in +1, x1.5
+    stat.apply_scaled(Modifier::new(2, 2.0), 0.5);
+    
+    // Should result in +2, x3.0
+    stat.apply_scaled(Modifier::new(4, 5.0), 0.5);
+
+    println!("{stat:?}");
+
+
+    assert_eq!(
+        stat,
+        Stat {
+            base: 10,
+            bonus: 3,
+            multiplier: 4.5,
+        }
+    )
+}
