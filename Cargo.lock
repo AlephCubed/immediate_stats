@@ -154,8 +154,8 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin"
-version = "0.5.0"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#9881bcbc54547064f6cdeb8efb1706ecbce423d3"
+version = "0.6.0"
+source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#b83b97269b9d15d02088143b488e402e7e99f1d6"
 dependencies = [
  "bevy_auto_plugin_proc_macros",
  "bevy_auto_plugin_shared",
@@ -165,8 +165,8 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin_proc_macros"
-version = "0.5.0"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#9881bcbc54547064f6cdeb8efb1706ecbce423d3"
+version = "0.6.0"
+source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#b83b97269b9d15d02088143b488e402e7e99f1d6"
 dependencies = [
  "bevy_auto_plugin_shared",
  "darling",
@@ -177,8 +177,8 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin_shared"
-version = "0.5.0"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#9881bcbc54547064f6cdeb8efb1706ecbce423d3"
+version = "0.6.0"
+source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#b83b97269b9d15d02088143b488e402e7e99f1d6"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
@@ -894,7 +894,7 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 
 [[package]]
 name = "immediate_stats"
-version = "0.3.0"
+version = "0.3.0-rc.1"
 dependencies = [
  "bevy",
  "bevy_app",
@@ -906,7 +906,7 @@ dependencies = [
 
 [[package]]
 name = "immediate_stats_macros"
-version = "0.3.0"
+version = "0.3.0-rc.1"
 dependencies = [
  "darling",
  "proc-macro-error",
