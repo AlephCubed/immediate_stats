@@ -37,7 +37,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
             bevy_auto_plugin::register_systems(&tree).unwrap_or_else(darling::Error::write_errors);
         quote! { #trait_impl #systems }.into()
     }
-    
+
     #[cfg(not(feature = "bevy_auto_plugin"))]
     trait_impl.into()
 }
