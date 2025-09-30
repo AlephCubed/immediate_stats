@@ -34,7 +34,7 @@ bevy_auto_plugin = { git = "https://github.com/StrikeForceZero/bevy_auto_plugin"
 bevy_ecs = { version = "0.17", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
-bevy_reflect = { version = "0.17.0-rc.1", default-features = false, optional = true }
+bevy_reflect = { version = "0.17", default-features = false, optional = true }
 immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.3.0", default-features = false }
 
 [dev-dependencies]
