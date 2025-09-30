@@ -78,6 +78,7 @@
 //! ### Version Compatibility
 //! | Bevy   | Immediate Stats |
 //! |--------|-----------------|
+//! | `0.17` | `0.3`           |
 //! | `0.16` | `0.1` - `0.2`   |
 
 #[cfg(feature = "bevy")]

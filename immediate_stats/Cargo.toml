@@ -1,6 +1,6 @@
 [package]
 name = "immediate_stats"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2024"
 description = "Game stats that reset every frame, inspired by immediate mode GUI."
 categories = ["game-development", "data-structures"]
@@ -20,7 +20,6 @@ bevy = [
   "dep:bevy_reflect",
   "immediate_stats_macros/bevy",
 ]
-bevy_butler = ["bevy", "dep:bevy-butler", "immediate_stats_macros/bevy_butler"]
 bevy_auto_plugin = [
   "bevy",
   "dep:bevy_auto_plugin",
@@ -28,19 +27,18 @@ bevy_auto_plugin = [
 ]
 
 [dependencies]
-bevy_app = { version = "0.16.0", default-features = false, optional = true, features = [
+bevy_app = { version = "0.17", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
-bevy-butler = { version = "0.6.1", optional = true }
-bevy_auto_plugin = { version = "0.5.0", optional = true }
-bevy_ecs = { version = "0.16.0", default-features = false, optional = true, features = [
+bevy_auto_plugin = { git = "https://github.com/StrikeForceZero/bevy_auto_plugin", rev = "refs/pull/22/head", optional = true }
+bevy_ecs = { version = "0.17", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
-bevy_reflect = { version = "0.16.0", default-features = false, optional = true }
-immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.2.0", default-features = false }
+bevy_reflect = { version = "0.17", default-features = false, optional = true }
+immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.3.0", default-features = false }
 
 [dev-dependencies]
-bevy = { version = "0.16.0", default-features = false }
+bevy = { version = "0.17", default-features = false }
 
 [lints.rust]
 missing_docs = "warn"
@@ -57,11 +55,6 @@ path = "examples/simple_main_loop.rs"
 name = "simple_bevy"
 path = "examples/simple_bevy.rs"
 required-features = ["bevy"]
-
-[[example]]
-name = "simple_bevy_butler"
-path = "examples/simple_bevy_butler.rs"
-required-features = ["bevy_butler"]
 
 [[example]]
 name = "simple_bevy_auto_plugin"

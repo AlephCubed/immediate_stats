@@ -1,7 +1,5 @@
 #[cfg(feature = "bevy_auto_plugin")]
 mod bevy_auto_plugin;
-#[cfg(feature = "bevy_butler")]
-mod bevy_butler;
 mod derive_enum;
 mod derive_struct;
 
@@ -25,7 +23,7 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         }
     };
 
-    let mut trait_impl = quote! {
+    let trait_impl = quote! {
         impl StatContainer for #ident {
             fn reset_modifiers(&mut self) {
                 #method_contents
@@ -33,25 +31,14 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         }
     };
 
-    #[cfg(feature = "bevy_butler")]
-    {
-        emit_warning!(
-            proc_macro2::Span::call_site(),
-            "The `bevy_butler` feature flag is depreciated."
-        );
-
-        let systems =
-            bevy_butler::register_systems(&tree).unwrap_or_else(darling::Error::write_errors);
-        trait_impl = quote! { #trait_impl #systems };
-    }
-
     #[cfg(feature = "bevy_auto_plugin")]
     {
         let systems =
             bevy_auto_plugin::register_systems(&tree).unwrap_or_else(darling::Error::write_errors);
-        trait_impl = quote! { #trait_impl #systems };
+        quote! { #trait_impl #systems }.into()
     }
-
+    
+    #[cfg(not(feature = "bevy_auto_plugin"))]
     trait_impl.into()
 }
 
