@@ -154,8 +154,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin"
-version = "0.5.0"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#9881bcbc54547064f6cdeb8efb1706ecbce423d3"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e60464caa30a2bbe7d27b3b75adee2e8de1f019366093335ba56b5f14ce82363"
 dependencies = [
  "bevy_auto_plugin_proc_macros",
  "bevy_auto_plugin_shared",
@@ -165,8 +166,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin_proc_macros"
-version = "0.5.0"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#9881bcbc54547064f6cdeb8efb1706ecbce423d3"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a599d829f3b16ba69f909ab86141271c1ec5a5511508245289cb3774df389074"
 dependencies = [
  "bevy_auto_plugin_shared",
  "darling",
@@ -177,8 +179,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin_shared"
-version = "0.5.0"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin?rev=refs%2Fpull%2F22%2Fhead#9881bcbc54547064f6cdeb8efb1706ecbce423d3"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6639f97a7e63a7a424c8a5dba32de72000934e9b03333b13c4bb9c1e95cee43a"
 dependencies = [
  "bevy_app",
  "bevy_ecs",
