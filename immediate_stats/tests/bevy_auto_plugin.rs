@@ -4,7 +4,7 @@
 extern crate immediate_stats;
 use crate::{Stat, StatContainer};
 use bevy_app::App;
-use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_init_resource};
+use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_init_resource};
 use bevy_ecs::prelude::*;
 use immediate_stats::*;
 

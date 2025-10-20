@@ -1,6 +1,6 @@
 [package]
 name = "immediate_stats_macros"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 description = "Game stats that reset every frame, inspired by immediate mode GUI."
 categories = ["game-development", "data-structures"]
@@ -21,7 +21,7 @@ bevy = []
 bevy_auto_plugin = ["bevy"]
 
 [dependencies]
-darling = "0.21.3"
+darling = "0.21"
 proc-macro2 = "1.0"
 proc-macro-error = "1.0"
 quote = "1.0"
