@@ -59,7 +59,7 @@
 //! # use bevy_app::prelude::*;
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
-//! # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_resource};
+//! # use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_resource};
 //! fn main() {
 //!     App::new().add_plugins((ImmediateStatsPlugin, MyPlugin)).run();
 //! }
@@ -74,6 +74,9 @@
 //! #[auto_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
 //! struct Speed(Stat);
 //! ```
+//!
+//! It is important to note that this only works when the `derive` is above the `auto_*` macro,
+//! and does *not* work with `auto_bind_plugin`.
 //!
 //! ### Version Compatibility
 //! | Bevy   | Immediate Stats |

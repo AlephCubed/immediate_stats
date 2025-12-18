@@ -69,6 +69,9 @@ struct MyPlugin;
 struct Speed(Stat);
 ```
 
+It is important to note that this only works when the `derive` is above the `auto_*` macro, 
+and does *not* work with `auto_bind_plugin`.
+
 ### Version Compatibility
 | Bevy   | Immediate Stats |
 |--------|-----------------|
