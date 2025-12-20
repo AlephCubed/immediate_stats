@@ -53,3 +53,18 @@ fn divide() {
         }
     );
 }
+
+#[test]
+fn scaled() {
+    let modifier = Modifier {
+        bonus: 10,
+        multiplier: 3.0,
+    };
+    assert_eq!(
+        modifier.scaled(0.5),
+        Modifier {
+            bonus: 5,
+            multiplier: 2.0,
+        }
+    );
+}

@@ -80,7 +80,9 @@ impl Stat {
         self.multiplier *= modifier.multiplier;
     }
 
-    /// Scales and applies the [`Modifier`] values to the bonus and multiplier.
+    /// [Scales](Modifier::scaled) and applies the [`Modifier`] values to the bonus and multiplier.
+    ///
+    /// When the scale is zero, the bonus will be zero while the multiplier will be one.
     ///
     /// This adds the bonuses, and multiplies the multipliers.
     pub fn apply_scaled(&mut self, modifier: Modifier, fraction: f32) {

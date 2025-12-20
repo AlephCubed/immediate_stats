@@ -42,6 +42,16 @@ impl Modifier {
             ..Self::default()
         }
     }
+
+    /// Returns a new modifier scaled by a fraction.
+    ///
+    /// When the scale is zero, the bonus will be zero while the multiplier will be one.
+    pub fn scaled(&self, fraction: f32) -> Self {
+        Self {
+            bonus: (self.bonus as f32 * fraction) as i32,
+            multiplier: (1.0 - fraction) * 1.0 + fraction * self.multiplier,
+        }
+    }
 }
 
 impl Default for Modifier {
