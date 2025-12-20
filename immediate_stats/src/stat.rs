@@ -2,6 +2,7 @@
 
 use crate::StatContainer;
 use crate::modifier::Modifier;
+use std::fmt::{Display, Formatter};
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 /// A stat that [resets][reset] to a base value every iteration.
@@ -131,5 +132,19 @@ impl DivAssign<f32> for Stat {
     /// Divides the stat's multiplier.
     fn div_assign(&mut self, rhs: f32) {
         self.multiplier /= rhs;
+    }
+}
+
+impl Display for Stat {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if let Some(precision) = f.precision() {
+            write!(
+                f,
+                "({} + {}) x {:.*}",
+                self.base, self.bonus, precision, self.multiplier
+            )
+        } else {
+            write!(f, "({} + {}) x {}", self.base, self.bonus, self.multiplier)
+        }
     }
 }
