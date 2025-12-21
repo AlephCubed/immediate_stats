@@ -2,6 +2,3 @@
 members = ["immediate_stats", "immediate_stats_macros"]
 
 resolver = "3"
-
-[workspace.package.metadata.docs.rs]
-all-features = true

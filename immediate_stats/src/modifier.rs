@@ -1,5 +1,6 @@
 //! Contains a modifier that can be applied to [`Stat`](crate::Stat).
 
+use std::fmt::{Display, Formatter};
 use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 /// Modifier values that can be [applied](super::Stat::apply) to a [`Stat`](super::Stat).
@@ -41,6 +42,16 @@ impl Modifier {
             ..Self::default()
         }
     }
+
+    /// Returns a new modifier scaled by a fraction.
+    ///
+    /// When the scale is zero, the bonus will be zero while the multiplier will be one.
+    pub fn scaled(&self, fraction: f32) -> Self {
+        Self {
+            bonus: (self.bonus as f32 * fraction) as i32,
+            multiplier: (1.0 - fraction) * 1.0 + fraction * self.multiplier,
+        }
+    }
 }
 
 impl Default for Modifier {
@@ -77,5 +88,15 @@ impl DivAssign<f32> for Modifier {
     /// Divides the modifier's multiplier.
     fn div_assign(&mut self, rhs: f32) {
         self.multiplier /= rhs;
+    }
+}
+
+impl Display for Modifier {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        if let Some(precision) = f.precision() {
+            write!(f, "(+{}) x {:.*}", self.bonus, precision, self.multiplier)
+        } else {
+            write!(f, "(+{}) x {}", self.bonus, self.multiplier)
+        }
     }
 }
