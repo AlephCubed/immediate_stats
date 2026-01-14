@@ -50,7 +50,7 @@ impl<'a> ToTokens for AutoPluginAttributes<'a> {
             let system_ident = format_ident!("__reset_{ident}_component_modifiers");
 
             tokens.extend(quote! {
-                #[bevy_auto_plugin::modes::global::prelude::auto_system(
+                #[bevy_auto_plugin::prelude::auto_system(
                     plugin = #plugin,
                     schedule = immediate_stats::__PreUpdate,
                     config(
@@ -73,7 +73,7 @@ impl<'a> ToTokens for AutoPluginAttributes<'a> {
             let system_ident = format_ident!("__reset_{ident}_resource_modifiers");
 
             tokens.extend(quote! {
-                #[bevy_auto_plugin::modes::global::prelude::auto_system(
+                #[bevy_auto_plugin::prelude::auto_system(
                     plugin = #plugin,
                     schedule = immediate_stats::__PreUpdate,
                     config(

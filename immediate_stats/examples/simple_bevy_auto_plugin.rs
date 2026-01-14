@@ -3,7 +3,7 @@
 
 use bevy::prelude::*;
 use bevy_auto_plugin;
-use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_system};
+use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_system};
 use immediate_stats::*;
 
 fn main() {

@@ -153,7 +153,7 @@ mod stat;
 /// # use bevy_app::prelude::*;
 /// # use bevy_ecs::prelude::*;
 /// # use immediate_stats::*;
-/// # use bevy_auto_plugin::modes::global::prelude::{AutoPlugin, auto_component, auto_resource};
+/// # use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_resource};
 /// #[derive(AutoPlugin)]
 /// #[auto_plugin(impl_plugin_trait)]
 /// struct MyPlugin;

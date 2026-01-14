@@ -1,6 +1,6 @@
 [package]
 name = "immediate_stats"
-version = "0.3.2"
+version = "0.4.0"
 edition = "2024"
 description = "Game stats that reset every frame, inspired by immediate mode GUI."
 categories = ["game-development", "data-structures"]
@@ -27,18 +27,18 @@ bevy_auto_plugin = [
 ]
 
 [dependencies]
-bevy_app = { version = "0.17", default-features = false, optional = true, features = [
+bevy_app = { version = "0.18", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
-bevy_auto_plugin = { version = "0.8", optional = true }
-bevy_ecs = { version = "0.17", default-features = false, optional = true, features = [
+bevy_auto_plugin = { version = "0.9", optional = true }
+bevy_ecs = { version = "0.18", default-features = false, optional = true, features = [
   "bevy_reflect",
 ] }
-bevy_reflect = { version = "0.17", default-features = false, optional = true }
-immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.3.2", default-features = false }
+bevy_reflect = { version = "0.18", default-features = false, optional = true }
+immediate_stats_macros = { path = "../immediate_stats_macros", version = "0.4.0", default-features = false }
 
 [dev-dependencies]
-bevy = { version = "0.17", default-features = false }
+bevy = { version = "0.18", default-features = false }
 
 [lints.rust]
 missing_docs = "warn"

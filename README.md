@@ -75,5 +75,6 @@ and does *not* work with `auto_bind_plugin`.
 ### Version Compatibility
 | Bevy   | Immediate Stats |
 |--------|-----------------|
+| `0.18` | `0.4`           |
 | `0.17` | `0.3`           |
 | `0.16` | `0.1` - `0.2`   |
