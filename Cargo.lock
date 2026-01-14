@@ -121,8 +121,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin"
-version = "0.8.2"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin#7e190259e5f08bcec8be577216f1e9cc3ed8a1db"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b00355e2dd268a7f9c7453773753edfedda475896c0b4e7b2d015aa04f4849fd"
 dependencies = [
  "bevy_auto_plugin_proc_macros",
  "bevy_auto_plugin_shared",
@@ -132,8 +133,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin_proc_macros"
-version = "0.8.2"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin#7e190259e5f08bcec8be577216f1e9cc3ed8a1db"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d85f2558b3a8f3d5e3e8df9debbff0665cad6c7c2bfde3537e7ff247fde3cd8f"
 dependencies = [
  "bevy_auto_plugin_shared",
  "proc-macro2",
@@ -141,8 +143,9 @@ dependencies = [
 
 [[package]]
 name = "bevy_auto_plugin_shared"
-version = "0.8.2"
-source = "git+https://github.com/StrikeForceZero/bevy_auto_plugin#7e190259e5f08bcec8be577216f1e9cc3ed8a1db"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f6d825af42f08348a7c2307f50aabde362e774dd906c274556bd6b71794c8476"
 dependencies = [
  "bevy_app",
  "darling 0.21.3",
@@ -788,7 +791,7 @@ checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 
 [[package]]
 name = "immediate_stats"
-version = "0.4.0-rc.1"
+version = "0.4.0"
 dependencies = [
  "bevy",
  "bevy_app",
@@ -800,7 +803,7 @@ dependencies = [
 
 [[package]]
 name = "immediate_stats_macros"
-version = "0.4.0-rc.1"
+version = "0.4.0"
 dependencies = [
  "darling 0.23.0",
  "proc-macro-error",
