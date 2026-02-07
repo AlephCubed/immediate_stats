@@ -1,4 +1,4 @@
-//! Tests the `add_component` attribute for automatic system registration.
+//! Tests the `ResetComponentHook` and `ResetResourceHook`.
 #![cfg(feature = "bevy_auto_plugin")]
 
 extern crate immediate_stats;
