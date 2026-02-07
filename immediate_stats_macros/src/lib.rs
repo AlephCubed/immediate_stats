@@ -1,5 +1,3 @@
-#[cfg(feature = "bevy_auto_plugin")]
-mod bevy_auto_plugin;
 mod derive_enum;
 mod derive_struct;
 
@@ -31,14 +29,6 @@ pub fn stat_container_derive(item: proc_macro::TokenStream) -> proc_macro::Token
         }
     };
 
-    #[cfg(feature = "bevy_auto_plugin")]
-    {
-        let systems =
-            bevy_auto_plugin::register_systems(&tree).unwrap_or_else(darling::Error::write_errors);
-        quote! { #trait_impl #systems }.into()
-    }
-
-    #[cfg(not(feature = "bevy_auto_plugin"))]
     trait_impl.into()
 }
 

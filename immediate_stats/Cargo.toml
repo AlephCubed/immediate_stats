@@ -20,11 +20,7 @@ bevy = [
   "dep:bevy_reflect",
   "immediate_stats_macros/bevy",
 ]
-bevy_auto_plugin = [
-  "bevy",
-  "dep:bevy_auto_plugin",
-  "immediate_stats_macros/bevy_auto_plugin",
-]
+bevy_auto_plugin = ["bevy", "dep:bevy_auto_plugin"]
 
 [dependencies]
 bevy_app = { version = "0.18", default-features = false, optional = true, features = [
