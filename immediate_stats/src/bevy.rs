@@ -1,6 +1,9 @@
 #![cfg(feature = "bevy")]
 //! Contains systems and components for resetting [`StatContainer`]s in the Bevy game engine.
 
+#[cfg(feature = "bevy_auto_plugin")]
+mod auto_plugin;
+
 use crate::StatContainer;
 use crate::modifier::Modifier;
 use crate::stat::Stat;
@@ -11,6 +14,9 @@ use bevy_ecs::prelude::{IntoScheduleConfigs, ReflectComponent, SystemSet};
 use bevy_reflect::Reflect;
 use bevy_reflect::prelude::ReflectDefault;
 use std::marker::PhantomData;
+
+#[cfg(feature = "bevy_auto_plugin")]
+pub use auto_plugin::*;
 
 /// Configures [system ordering](StatSystems) and registers types with the Bevy type registry.
 ///
