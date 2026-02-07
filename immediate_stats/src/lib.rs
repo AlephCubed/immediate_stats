@@ -50,16 +50,16 @@
 //!
 //! ### Bevy Auto Plugin
 //!
-//! If you use [Bevy Auto Plugin](https://github.com/strikeforcezero/bevy_auto_plugin/),
-//! you can also use the `bevy_auto_plugin` feature flag. This automatically registers the required
-//! system(s) by leveraging the existing `auto_component` and `auto_resource` macros.
+//! If you use [Bevy Auto Plugin](https://github.com/strikeforcezero/bevy_auto_plugin/), you can also use the `bevy_auto_plugin` feature flag.
+//! This adds build hooks for that automatically add the reset plugin.
 //!
 #![cfg_attr(not(feature = "bevy_auto_plugin"), doc = "```rust ignore")]
 #![cfg_attr(feature = "bevy_auto_plugin", doc = "```rust")]
 //! # use bevy_app::prelude::*;
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
-//! # use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_resource};
+//! # use bevy_auto_plugin::prelude::{AutoPlugin, auto_plugin_build_hook, auto_resource};
+//!
 //! fn main() {
 //!     App::new().add_plugins((ImmediateStatsPlugin, MyPlugin)).run();
 //! }
@@ -68,15 +68,11 @@
 //! #[auto_plugin(impl_plugin_trait)]
 //! struct MyPlugin;
 //!
-//! // `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
-//! #[derive(StatContainer, Component, Resource)]
-//! #[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-//! #[auto_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+//! #[derive(StatContainer, Component)]
+//! // Use hook to add the `ResetComponentPlugin` to `MyPlugin` automatically.
+//! #[auto_plugin_build_hook(plugin = MyPlugin, hook = ResetComponentHook)]
 //! struct Speed(Stat);
 //! ```
-//!
-//! It is important to note that this only works when the `derive` is above the `auto_*` macro,
-//! and does *not* work with `auto_bind_plugin`.
 //!
 //! ### Version Compatibility
 //! | Bevy   | Immediate Stats |
@@ -143,26 +139,6 @@ mod stat;
 ///     assert_eq!(partial.custom, Health::default());
 ///     assert_eq!(partial.ignored, Stat::default().with_bonus(10));
 /// }
-/// ```
-/// # Bevy Auto Plugin
-/// If the `bevy_auto_plugin` feature flag is enabled, the existing `auto_component` and
-/// `auto_resource` macros will register [`reset_component_modifiers`] and/or
-/// [`reset_resource_modifiers`] automatically.
-#[cfg_attr(not(feature = "bevy_auto_plugin"), doc = "```rust ignore")]
-#[cfg_attr(feature = "bevy_auto_plugin", doc = "```rust")]
-/// # use bevy_app::prelude::*;
-/// # use bevy_ecs::prelude::*;
-/// # use immediate_stats::*;
-/// # use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_resource};
-/// #[derive(AutoPlugin)]
-/// #[auto_plugin(impl_plugin_trait)]
-/// struct MyPlugin;
-///
-/// // `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
-/// #[derive(StatContainer, Component, Resource)]
-/// #[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-/// #[auto_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
-/// struct Speed(Stat);
 /// ```
 pub use immediate_stats_macros::StatContainer;
 pub use modifier::*;

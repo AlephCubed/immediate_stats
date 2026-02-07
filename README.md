@@ -51,7 +51,7 @@ fn main() {
 ### Bevy Auto Plugin
 
 If you use [Bevy Auto Plugin](https://github.com/strikeforcezero/bevy_auto_plugin/), you can also use the `bevy_auto_plugin` feature flag.
-This automatically registers the required system(s) by leveraging the existing `auto_component` and `auto_resource` macros.
+This adds build hooks for that automatically add the reset plugin.
 
 ```rust
 fn main() {
@@ -62,15 +62,11 @@ fn main() {
 #[auto_plugin(impl_plugin_trait)]
 struct MyPlugin;
 
-// `StatContainer` derive hooks into the existing `auto_component` and `auto_resource` macros.
-#[derive(StatContainer, Component, Resource)]
-#[auto_component(plugin = MyPlugin)] // Adds `reset_component_modifiers` system.
-#[auto_init_resource(plugin = MyPlugin)] // Adds `reset_resource_modifiers` system.
+#[derive(StatContainer, Component)]
+// Use hook to add the `ResetComponentPlugin` to `MyPlugin` automatically.
+#[auto_plugin_build_hook(plugin = MyPlugin, hook = ResetComponentHook)]
 struct Speed(Stat);
 ```
-
-It is important to note that this only works when the `derive` is above the `auto_*` macro, 
-and does *not* work with `auto_bind_plugin`.
 
 ### Version Compatibility
 | Bevy   | Immediate Stats |
