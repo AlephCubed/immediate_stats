@@ -3,7 +3,7 @@
 
 use bevy::prelude::*;
 use bevy_auto_plugin;
-use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_system};
+use bevy_auto_plugin::prelude::{AutoPlugin, auto_plugin_build_hook, auto_system};
 use immediate_stats::*;
 
 fn main() {
@@ -17,9 +17,9 @@ fn main() {
 struct SpeedPlugin;
 
 // Implements `reset_modifiers` by passing the call onto `Stat`.
-// This will also add the `ResetComponentPlugin` to `SpeedPlugin`.
 #[derive(StatContainer, Component)]
-#[auto_component(plugin = SpeedPlugin)]
+// Use hook to add the `ResetComponentPlugin` to `SpeedPlugin` automatically.
+#[auto_plugin_build_hook(plugin = SpeedPlugin, hook = ResetComponentHook)]
 struct Speed(Stat);
 
 #[auto_system(plugin = SpeedPlugin, schedule = Startup)]
