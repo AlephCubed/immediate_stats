@@ -1,10 +1,12 @@
-//! Tests the `add_component` attribute for automatic system registration.
+//! Tests the `ResetComponentHook` and `ResetResourceHook`.
 #![cfg(feature = "bevy_auto_plugin")]
 
 extern crate immediate_stats;
 use crate::{Stat, StatContainer};
 use bevy_app::App;
-use bevy_auto_plugin::prelude::{AutoPlugin, auto_component, auto_init_resource};
+use bevy_auto_plugin::prelude::{
+    AutoPlugin, auto_bind_plugin, auto_component, auto_plugin_build_hook, auto_resource,
+};
 use bevy_ecs::prelude::*;
 use immediate_stats::*;
 
@@ -13,8 +15,11 @@ use immediate_stats::*;
 struct MyPlugin;
 
 #[derive(Resource, Component, StatContainer, Default, PartialEq, Debug)]
-#[auto_component(plugin = MyPlugin)]
-#[auto_init_resource(plugin = MyPlugin)]
+#[auto_bind_plugin(plugin = MyPlugin)]
+#[auto_plugin_build_hook(hook = ResetComponentHook)]
+#[auto_plugin_build_hook(hook = ResetResourceHook)]
+#[auto_component()]
+#[auto_resource(init)]
 struct Health(Stat);
 
 #[test]
