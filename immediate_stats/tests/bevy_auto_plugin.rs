@@ -4,9 +4,7 @@
 extern crate immediate_stats;
 use crate::{Stat, StatContainer};
 use bevy_app::App;
-use bevy_auto_plugin::prelude::{
-    AutoPlugin, auto_bind_plugin, auto_component, auto_plugin_build_hook, auto_resource,
-};
+use bevy_auto_plugin::prelude::{AutoPlugin, auto_bind_plugin, auto_plugin_build_hook};
 use bevy_ecs::prelude::*;
 use immediate_stats::*;
 
@@ -14,12 +12,10 @@ use immediate_stats::*;
 #[auto_plugin(impl_plugin_trait)]
 struct MyPlugin;
 
-#[derive(Resource, Component, StatContainer, Default, PartialEq, Debug)]
+#[derive(Resource, StatContainer, Default, PartialEq, Debug)]
 #[auto_bind_plugin(plugin = MyPlugin)]
 #[auto_plugin_build_hook(hook = ResetComponentHook)]
 #[auto_plugin_build_hook(hook = ResetResourceHook)]
-#[auto_component()]
-#[auto_resource(init)]
 struct Health(Stat);
 
 #[test]

@@ -57,11 +57,17 @@ pub struct PauseStatReset;
 /// This can be paused on a per-entity basis using the [`PauseStatReset`] component.
 ///
 /// Reset occurs in the [`Reset`](StatSystems::Reset) system set during `PreUpdate`.
-pub struct ResetComponentPlugin<T: Component<Mutability = Mutable> + StatContainer> {
+pub struct ResetComponentPlugin<T>
+where
+    T: Component<Mutability = Mutable> + StatContainer,
+{
     _phantom: PhantomData<T>,
 }
 
-impl<T: Component<Mutability = Mutable> + StatContainer> Plugin for ResetComponentPlugin<T> {
+impl<T> Plugin for ResetComponentPlugin<T>
+where
+    T: Component<Mutability = Mutable> + StatContainer,
+{
     fn build(&self, app: &mut App) {
         app.add_systems(
             PreUpdate,
@@ -74,22 +80,29 @@ impl<T: Component<Mutability = Mutable> + StatContainer> Plugin for ResetCompone
 /// This can be paused on a per-entity basis using the [`PauseStatReset`] component.
 ///
 /// Use the [`ResetResourcePlugin`] for recommended configuration.
-pub fn reset_component_modifiers<T: Component<Mutability = Mutable> + StatContainer>(
-    mut query: Query<&mut T, Without<PauseStatReset>>,
-) {
+pub fn reset_component_modifiers<T>(mut query: Query<&mut T, Without<PauseStatReset>>)
+where
+    T: Component<Mutability = Mutable> + StatContainer,
+{
     for mut stat in &mut query {
         stat.reset_modifiers();
     }
 }
 
-impl<T: Component<Mutability = Mutable> + StatContainer> ResetComponentPlugin<T> {
+impl<T> ResetComponentPlugin<T>
+where
+    T: Component<Mutability = Mutable> + StatContainer,
+{
     #[allow(missing_docs)]
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl<T: Component<Mutability = Mutable> + StatContainer> Default for ResetComponentPlugin<T> {
+impl<T> Default for ResetComponentPlugin<T>
+where
+    T: Component<Mutability = Mutable> + StatContainer,
+{
     fn default() -> Self {
         Self {
             _phantom: PhantomData::default(),
@@ -100,11 +113,17 @@ impl<T: Component<Mutability = Mutable> + StatContainer> Default for ResetCompon
 /// Calls [`reset_modifiers`](StatContainer::reset_modifiers) on the `T` resource, if it exists.
 ///
 /// Reset occurs in the [`Reset`](StatSystems::Reset) system set during `PreUpdate`.
-pub struct ResetResourcePlugin<T: Resource + StatContainer> {
+pub struct ResetResourcePlugin<T>
+where
+    T: Resource<Mutability = Mutable> + StatContainer,
+{
     _phantom: PhantomData<T>,
 }
 
-impl<T: Resource + StatContainer> Plugin for ResetResourcePlugin<T> {
+impl<T> Plugin for ResetResourcePlugin<T>
+where
+    T: Resource<Mutability = Mutable> + StatContainer,
+{
     fn build(&self, app: &mut App) {
         app.add_systems(
             PreUpdate,
@@ -116,20 +135,29 @@ impl<T: Resource + StatContainer> Plugin for ResetResourcePlugin<T> {
 /// Calls [`reset_modifiers`](StatContainer::reset_modifiers) on the `T` resource, if it exists.
 ///
 /// Use the [`ResetResourcePlugin`] for recommended configuration.
-pub fn reset_resource_modifiers<T: Resource + StatContainer>(res: Option<ResMut<T>>) {
+pub fn reset_resource_modifiers<T>(res: Option<ResMut<T>>)
+where
+    T: Resource<Mutability = Mutable> + StatContainer,
+{
     if let Some(mut res) = res {
         res.reset_modifiers();
     }
 }
 
-impl<T: Resource + StatContainer> ResetResourcePlugin<T> {
+impl<T> ResetResourcePlugin<T>
+where
+    T: Resource<Mutability = Mutable> + StatContainer,
+{
     #[allow(missing_docs)]
     pub fn new() -> Self {
         Self::default()
     }
 }
 
-impl<T: Resource + StatContainer> Default for ResetResourcePlugin<T> {
+impl<T> Default for ResetResourcePlugin<T>
+where
+    T: Resource<Mutability = Mutable> + StatContainer,
+{
     fn default() -> Self {
         Self {
             _phantom: PhantomData::default(),

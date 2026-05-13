@@ -10,8 +10,9 @@ use bevy_ecs::prelude::{Component, Resource};
 /// A Bevy Auto Plugin hook that adds the [`ResetComponentPlugin`] for the component.
 pub struct ResetComponentHook;
 
-impl<T: Component<Mutability = Mutable> + StatContainer + 'static> AutoPluginBuildHook<T>
-    for ResetComponentHook
+impl<T> AutoPluginBuildHook<T> for ResetComponentHook
+where
+    T: Component<Mutability = Mutable> + StatContainer,
 {
     fn on_build(&self, app: &mut App) {
         app.add_plugins(ResetComponentPlugin::<T>::new());
@@ -21,7 +22,10 @@ impl<T: Component<Mutability = Mutable> + StatContainer + 'static> AutoPluginBui
 /// A Bevy Auto Plugin hook that adds the [`ResetResourcePlugin`] for the resource.
 pub struct ResetResourceHook;
 
-impl<T: Resource + StatContainer + 'static> AutoPluginBuildHook<T> for ResetResourceHook {
+impl<T> AutoPluginBuildHook<T> for ResetResourceHook
+where
+    T: Resource<Mutability = Mutable> + StatContainer,
+{
     fn on_build(&self, app: &mut App) {
         app.add_plugins(ResetResourcePlugin::<T>::new());
     }

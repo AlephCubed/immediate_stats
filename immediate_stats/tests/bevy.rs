@@ -4,7 +4,7 @@
 use bevy_ecs::prelude::*;
 use immediate_stats::*;
 
-#[derive(Component, Resource, StatContainer, PartialEq, Debug, Clone)]
+#[derive(Resource, StatContainer, PartialEq, Debug, Clone)]
 struct Health(Stat);
 
 #[test]

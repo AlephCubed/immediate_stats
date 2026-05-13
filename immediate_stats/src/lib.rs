@@ -34,7 +34,7 @@
 //! # use bevy_app::prelude::*;
 //! # use bevy_ecs::prelude::*;
 //! # use immediate_stats::*;
-//! #[derive(StatContainer, Component, Resource, Default)]
+//! #[derive(StatContainer, Resource, Default)]
 //! struct Speed(Stat);
 //!
 //! fn main() {
@@ -77,7 +77,8 @@
 //! ### Version Compatibility
 //! | Bevy   | Immediate Stats |
 //! |--------|-----------------|
-//! | `0.18` | `0.4`           |
+//! | `0.19` | `0.6`           |
+//! | `0.18` | `0.4` - `0.5`   |
 //! | `0.17` | `0.3`           |
 //! | `0.16` | `0.1` - `0.2`   |
 
