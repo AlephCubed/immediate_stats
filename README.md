@@ -6,8 +6,9 @@
 
 Game stats that reset every frame, inspired by immediate mode GUI.
 
-This makes it easy to implement temporary buffs/debuffs, and effects that change over time.
-Using a derive macro, stat resets are propagated to any stat fields, 
+This makes it easy to implement temporary buffs/debuffs,
+and effects that change over time.
+Using a derive macro, stat resets are propagated to any stat fields,
 making it easy to compose stats into more complex objects.
 
 ```rust
@@ -30,8 +31,9 @@ fn main() {
 
 ## Bevy
 
-There is build-in integration with the [Bevy Engine](https://bevyengine.org) via the `bevy` feature flag.
-This adds plugins for resetting `StatContainer` components and resources.
+There is build-in integration with the [Bevy Engine](https://bevyengine.org)
+via the `bevy` feature flag. This adds plugins for resetting `StatContainer`
+components and resources.
 
 ```rust
 #[derive(StatContainer, Component, Resource)]
@@ -50,7 +52,8 @@ fn main() {
 
 ### Bevy Auto Plugin
 
-If you use [Bevy Auto Plugin](https://github.com/strikeforcezero/bevy_auto_plugin/), you can also use the `bevy_auto_plugin` feature flag.
+If you use [Bevy Auto Plugin](https://github.com/strikeforcezero/bevy_auto_plugin/),
+you can also use the `bevy_auto_plugin` feature flag.
 This adds build hooks that automatically add the reset plugin.
 
 ```rust
@@ -69,6 +72,7 @@ struct Speed(Stat);
 ```
 
 ### Version Compatibility
+
 | Bevy   | Immediate Stats |
 |--------|-----------------|
 | `0.19` | `0.6`           |
